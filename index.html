@@ -3,10 +3,734 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PrezTimingTool</title>
-<meta http-equiv="refresh" content="0;url=https://sylvainservicenow.github.io/preztimingtool/">
+<title>PrezTimingTool — Slide Timing Planner</title>
+<meta name="description" content="Plan and fine-tune your presentation slide timing with an intuitive visual timeline.">
+<meta property="og:title" content="PrezTimingTool">
+<meta property="og:description" content="Free visual tool to plan presentation slide timing. Drag, adjust, compare variants.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⏱</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+if(window.pdfjsLib){window.pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';window._pdfjs=window.pdfjsLib;}
+</script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#faf5ef;--sf:#fff;--sa:#fdf8f3;--bd:#ece4d9;--bl:#f2ebe2;
+  --tx:#3a3028;--tm:#78695a;--td:#b0a292;
+  --ac:#7c5cf5;--al:#9b82f8;--ab:#f3efff;--abr:#d9cffc;
+  --coral:#ef6461;--green:#4caf50;--gold:#f5a623;
+  --sh:0 1px 3px rgba(55,35,15,.05),0 4px 14px rgba(55,35,15,.07);
+  --shl:0 6px 24px rgba(55,35,15,.1),0 16px 48px rgba(55,35,15,.08);
+  --r:12px;--rs:8px;
+  --f:'Plus Jakarta Sans',-apple-system,system-ui,sans-serif;
+  --m:'JetBrains Mono','SF Mono',monospace;
+}
+html{height:100%}
+body{min-height:100%;background:var(--bg);color:var(--tx);font-family:var(--f);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+button{font-family:var(--f);cursor:pointer;border:none;background:none}
+input{font-family:var(--f);color:var(--tx)}
+input:focus{border-color:var(--ac)!important;outline:none}
+button:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+::-webkit-scrollbar{height:8px}
+::-webkit-scrollbar-track{background:var(--bl);border-radius:4px}
+::-webkit-scrollbar-thumb{background:var(--bd);border-radius:4px}
+
+/* ── Layout ── */
+.page{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px}
+.col{max-width:560px;width:100%;display:flex;flex-direction:column;gap:20px}
+.card{background:var(--sf);border-radius:16px;padding:32px;box-shadow:var(--sh);border:1px solid var(--bl)}
+.row{display:flex;gap:12px}
+.fg{margin-bottom:16px;display:flex;flex-direction:column;flex:1}
+.fl{font-size:12px;font-weight:700;color:var(--td);margin-bottom:6px;text-transform:uppercase;letter-spacing:.8px}
+.fi{background:var(--sa);border:1.5px solid var(--bd);border-radius:10px;padding:10px 14px;font-size:15px;color:var(--tx);width:100%;box-sizing:border-box}
+.fi-sm{padding:5px 10px;font-size:13px}
+.fi-mono{font-family:var(--m);font-weight:600;text-align:center}
+
+/* ── Buttons ── */
+.bp{background:linear-gradient(135deg,var(--ac),var(--al));color:#fff;border-radius:10px;padding:11px 28px;font-size:15px;font-weight:700;display:inline-flex;align-items:center;gap:8px;box-shadow:0 2px 8px rgba(124,92,245,.3);transition:transform .1s}
+.bp:hover{transform:translateY(-1px)}
+.bs{background:var(--sf);color:var(--tx);border:1.5px solid var(--bd);border-radius:10px;padding:10px 20px;font-size:14px;font-weight:600;display:inline-flex;align-items:center;gap:6px;transition:background .15s}
+.bs:hover{background:var(--sa)}
+.bk{color:var(--tm);font-size:14px;display:flex;align-items:center;gap:2px;font-weight:600;padding:0}
+.bk:hover{color:var(--tx)}
+.bi{color:var(--td);padding:4px;border-radius:6px;display:flex}
+.bi:hover{color:var(--tx);background:var(--sa)}
+.bt{background:none;border:1.5px solid var(--bd);border-radius:var(--rs);padding:6px 10px;color:var(--tx);display:flex;align-items:center;gap:5px;font-size:13px;font-weight:600;transition:background .15s}
+.bt:hover{background:var(--sa)}
+.bt[disabled]{opacity:.35;pointer-events:none}
+.bd{background:var(--sa);border:1.5px solid var(--bd);border-radius:var(--rs);padding:7px 12px;display:flex;align-items:center;gap:4px;color:var(--tm);font-size:13px;font-weight:600}
+.bd:hover{background:var(--bl)}
+.pill{background:var(--sa);border:1.5px solid var(--bd);border-radius:var(--rs);padding:8px 16px;font-size:13px;font-weight:600;color:var(--tx)}
+.pill.active{background:var(--ab);border-color:var(--ac);color:var(--ac)}
+.sec-l{font-size:11px;font-weight:700;color:var(--td);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:8px}
+.prev{display:flex;align-items:center;gap:8px;padding:10px 16px;background:var(--ab);border-radius:10px;margin-bottom:20px;font-family:var(--m);font-size:13px;color:var(--ac);font-weight:500;border:1px solid var(--abr)}
+.badge{font-size:12px;font-weight:600;font-family:var(--m);color:var(--ac);background:var(--ab);padding:2px 8px;border-radius:6px;display:inline-block}
+.badge-d{font-size:12px;font-weight:500;color:var(--td);background:var(--sa);padding:2px 8px;border-radius:6px;border:1px solid var(--bd);display:inline-block}
+
+/* ── Home ── */
+.hero-icon{font-size:64px;margin-bottom:8px;animation:sttFloat 3s ease-in-out infinite}
+@keyframes sttFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.hero-t{font-size:36px;font-weight:800;letter-spacing:-.5px;background:linear-gradient(135deg,var(--ac),#ff8a65);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-s{font-size:16px;color:var(--tm);margin:6px 0 0;font-weight:500}
+.plan-row{display:flex;align-items:center;gap:14px;padding:14px 18px;background:var(--sf);border-radius:12px;box-shadow:0 1px 2px rgba(0,0,0,.03);border:1px solid var(--bl);cursor:pointer;transition:transform .15s}
+.plan-row:hover{transform:translateY(-1px);box-shadow:var(--sh)}
+.plan-icon{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:var(--ac);flex-shrink:0}
+.hid-pill{background:var(--sf);border:1px solid var(--bd);border-radius:var(--rs);padding:6px 14px;font-size:13px;color:var(--td);display:flex;align-items:center;gap:6px}
+.hid-pill:hover{background:var(--sa)}
+
+/* ── Editor ── */
+.ed-page{min-height:100vh;display:flex;flex-direction:column}
+.top-bar{display:flex;align-items:center;gap:12px;padding:10px 24px;background:rgba(255,255,255,.88);backdrop-filter:blur(12px);border-bottom:1px solid var(--bl);position:sticky;top:0;z-index:100}
+.top-nm{background:none;border:none;color:var(--tx);font-size:18px;font-weight:800;font-family:var(--f);outline:none;flex:1;min-width:0}
+.var-area{padding:20px 24px;display:flex;flex-direction:column;gap:16px;flex:1;overflow:auto}
+.v-row{background:var(--sf);border-radius:14px;box-shadow:var(--sh);border:1.5px solid transparent;overflow:hidden;transition:border-color .2s}
+.v-row.active{border-color:var(--ac);box-shadow:0 0 0 1px var(--abr),var(--sh)}
+.v-head{display:flex;align-items:center;gap:8px;padding:10px 16px;background:var(--sa);border-bottom:1px solid var(--bl);cursor:pointer}
+.v-nm{background:none;border:none;color:var(--tx);font-size:14px;font-weight:700;font-family:var(--f);outline:none;width:120px}
+
+/* ── Timeline ── */
+.tl-out{padding:8px 16px 10px;overflow-x:auto;overflow-y:hidden}
+.tl-mk{position:relative;height:22px;margin-bottom:2px}
+.tl-mk-l{font-size:10px;color:var(--td);font-family:var(--m);font-weight:500;margin-top:1px}
+.tl-tk{display:flex;align-items:stretch;min-height:110px}
+.sl{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:8px 6px;background:var(--sf);border-radius:10px;border:1.5px solid var(--bd);cursor:pointer;transition:border-color .15s,box-shadow .15s,background .15s;overflow:hidden;position:relative;min-height:100px;box-sizing:border-box;user-select:none;flex-shrink:0}
+.sl.sel{border-color:var(--ac);background:var(--ab);box-shadow:0 0 0 2px var(--abr)}
+.sl.zero{background:var(--sa);opacity:.4;min-width:8px;max-width:8px;padding:0;border-radius:4px;display:flex;align-items:center;justify-content:center}
+.sl-grip{position:absolute;top:4px;left:3px;cursor:grab;color:var(--td)}
+.sl-n{font-size:20px;font-weight:800;color:var(--ac);line-height:1}
+.sl-l{font-size:11px;color:var(--tm);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center;min-height:14px}
+.sl-d{font-size:13px;font-family:var(--m);color:var(--tx);font-weight:600}
+.sl-c{font-size:10px;font-family:var(--m);color:var(--td);font-weight:500}
+.sl-thumb{width:90%;max-width:80px;aspect-ratio:16/9;border-radius:4px;object-fit:cover;border:1px solid var(--bd);margin:2px 0}
+.pptx-drop{border:2px dashed var(--bd);border-radius:12px;padding:24px;text-align:center;transition:border-color .2s,background .2s;cursor:pointer}
+.pptx-drop:hover,.pptx-drop.over{border-color:var(--ac);background:var(--ab)}
+.pptx-preview{display:flex;gap:8px;overflow-x:auto;padding:12px 0;margin-top:12px}
+.pptx-thumb{width:80px;flex-shrink:0;border-radius:6px;overflow:hidden;border:1.5px solid var(--bd);background:var(--sf)}
+.pptx-thumb img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block}
+.pptx-thumb-label{font-size:9px;padding:2px 4px;color:var(--td);text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.div-h{width:14px;cursor:col-resize;display:flex;align-items:center;justify-content:center;z-index:10;flex-shrink:0}
+.div-l{width:2px;height:50%;border-radius:2px;background:var(--bd);transition:background .15s,width .15s}
+.div-h:hover .div-l,.div-l.dragging{background:var(--ac);width:3px}
+
+/* ── Detail ── */
+.det-bar{padding:12px 16px;border-top:1px solid var(--bl);background:var(--sa);display:flex;align-items:center;gap:20px}
+.det-bar .sl-big{font-size:28px;font-weight:800;color:var(--ac);line-height:1}
+.det-bar input[type=range]{flex:1;accent-color:var(--ac);cursor:pointer;height:6px}
+
+/* ── Modal ── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.2);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:1000}
+.modal{background:var(--sf);border-radius:16px;padding:32px;min-width:400px;max-width:480px;box-shadow:var(--shl);border:1px solid var(--bl)}
+
+/* ── Tooltip ── */
+.tip-wrap{position:relative;display:inline-flex}
+.tip{position:fixed;background:#3a3028;color:#fff;font-size:11px;font-weight:600;padding:4px 10px;border-radius:6px;white-space:nowrap;pointer-events:none;z-index:99999;font-family:var(--f);box-shadow:0 2px 8px rgba(0,0,0,.25);transform:translateX(-50%)}
+
+/* ── Utility ── */
+.hidden{display:none!important}
+.gap-6{gap:6px}.gap-8{gap:8px}
+.flex{display:flex}.flex-col{flex-direction:column}.items-c{align-items:center}.justify-c{justify-content:center}.justify-e{justify-content:flex-end}
+.flex-1{flex:1}.shrink-0{flex-shrink:0}
+.text-c{text-align:center}
+.mt-8{margin-top:8px}.mt-12{margin-top:12px}.mt-20{margin-top:20px}.mt-32{margin-top:32px}
+.mb-4{margin-bottom:4px}.mb-16{margin-bottom:16px}.mb-20{margin-bottom:20px}.mb-24{margin-bottom:24px}
+.w-full{width:100%}
+</style>
 </head>
 <body>
-<p>Redirecting to <a href="https://sylvainservicenow.github.io/preztimingtool/">PrezTimingTool</a>...</p>
+
+<div id="app"></div>
+
+<script>
+/* ═══════════════════════════════════════
+   PrezTimingTool — Core Engine
+   Vanilla JS, zero dependencies
+   ═══════════════════════════════════════ */
+
+const STEP=15,MAX_UNDO=20,MAX_SLIDES=50,MAX_LABEL=15;
+const $=s=>document.querySelector(s);
+const $$=s=>document.querySelectorAll(s);
+const el=(tag,cls,html)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(html)e.innerHTML=html;return e};
+const uid=()=>Math.random().toString(36).slice(2,10);
+const clamp=(v,lo,hi)=>Math.max(lo,Math.min(hi,v));
+const round=v=>Math.round(v/STEP)*STEP;
+const deep=o=>JSON.parse(JSON.stringify(o));
+const fmt=s=>`${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
+const fmtD=s=>{if(!s)return'0s';const m=Math.floor(s/60),r=s%60;return m&&r?`${m}m ${r}s`:m?`${m}m`:`${r}s`};
+const parseT=v=>{const c=v.trim();if(c.includes(':')){const p=c.split(':');return(parseInt(p[0])||0)*60+(parseInt(p[1])||0)}return parseInt(c)||0};
+const COLORS=['#ffe0cc','#fff3cc','#d4f5d4','#cce8ff','#f0ccff','#ffe0e6','#ccf5f0'];
+
+// SVG icons
+const IC={
+  plus:`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`,
+  trash:`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>`,
+  copy:`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`,
+  undo:`<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>`,
+  redo:`<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.13-9.36L23 10"/></svg>`,
+  save:`<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>`,
+  down:`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`,
+  gear:`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>`,
+  eyeOff:`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`,
+  eye:`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`,
+  chevL:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>`,
+  clock:`<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`,
+  file:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>`,
+  grip:`<svg width="10" height="14" viewBox="0 0 10 14" fill="currentColor" opacity=".22"><circle cx="3" cy="2" r="1.3"/><circle cx="7" cy="2" r="1.3"/><circle cx="3" cy="7" r="1.3"/><circle cx="7" cy="7" r="1.3"/><circle cx="3" cy="12" r="1.3"/><circle cx="7" cy="12" r="1.3"/></svg>`,
+};
+const ic=(name,size)=>{let s=IC[name]||'';if(size)s=s.replace(/width="\d+"/,`width="${size}"`).replace(/height="\d+"/,`height="${size}"`);return s};
+
+// ─── Tooltip system ───
+let tipEl=null;
+function initTips(){
+  tipEl=el('div','tip');tipEl.style.display='none';document.body.appendChild(tipEl);
+  document.addEventListener('mouseover',e=>{
+    const t=e.target.closest('[data-tip]');
+    if(t){const r=t.getBoundingClientRect();tipEl.textContent=t.dataset.tip;tipEl.style.display='block';tipEl.style.top=(r.top-34)+'px';tipEl.style.left=(r.left+r.width/2)+'px';}
+    else{tipEl.style.display='none';}
+  });
+}
+
+// ─── State ───
+let state={screen:'home',plans:[],curPlan:null,actVId:null,selId:null,hist:[],fut:[],dragId:null,fileHandle:null};
+
+function mkSlide(d,label,thumb){return{id:uid(),duration:d,label:label||'',thumb:thumb||null}}
+function initSlides(n,tot){const p=round(Math.floor(tot/n));const sl=Array.from({length:n},()=>mkSlide(p));const u=p*n;if(u<tot)sl[sl.length-1].duration+=tot-u;return sl}
+
+// ─── PPTX Parser (titles only, no thumbnails) ───
+async function parsePptx(file){
+  if(typeof JSZip==='undefined'){alert('JSZip not loaded. Check internet connection.');return null}
+  try{
+    const zip=await JSZip.loadAsync(file);
+    const slideFiles=[];
+    zip.forEach((path)=>{if(/^ppt\/slides\/slide\d+\.xml$/.test(path))slideFiles.push({path,num:parseInt(path.match(/slide(\d+)/)[1])})});
+    slideFiles.sort((a,b)=>a.num-b.num);
+    const slideCount=slideFiles.length;
+    if(!slideCount){alert('No slides found in this file.');return null}
+    const titles=[];
+    for(const sf of slideFiles){
+      const xml=await zip.file(sf.path).async('text');
+      let title='';
+      const titleMatch=xml.match(/<p:sp>[\s\S]*?<p:ph[^>]*type="title"[\s\S]*?<\/p:sp>/i)||xml.match(/<p:sp>[\s\S]*?<p:ph[^>]*type="ctrTitle"[\s\S]*?<\/p:sp>/i);
+      if(titleMatch){const texts=titleMatch[0].match(/<a:t>([^<]*)<\/a:t>/g);if(texts)title=texts.map(t=>t.replace(/<\/?a:t>/g,'')).join(' ').trim()}
+      if(!title){const ft=xml.match(/<a:t>([^<]+)<\/a:t>/);if(ft)title=ft[1].trim().slice(0,30)}
+      titles.push(title.slice(0,MAX_LABEL));
+    }
+    return{slideCount,titles,thumbs:new Array(slideCount).fill(null)};
+  }catch(e){console.error('PPTX parse error:',e);alert('Could not parse this PPTX file.');return null}
+}
+
+// ─── PDF Parser (renders real slide thumbnails) ───
+async function parsePdf(file){
+  const pdfjsLib=window._pdfjs;
+  if(!pdfjsLib){alert('PDF renderer not loaded yet. Please wait a moment and try again.');return null}
+  try{
+    const buf=await file.arrayBuffer();
+    const pdf=await pdfjsLib.getDocument({data:buf}).promise;
+    const slideCount=pdf.numPages;
+    if(!slideCount){alert('No pages found in this PDF.');return null}
+    const thumbs=[];
+    const TW=320;
+    for(let i=1;i<=slideCount;i++){
+      try{
+        const page=await pdf.getPage(i);
+        const vp=page.getViewport({scale:1});
+        const scale=TW/vp.width;
+        const svp=page.getViewport({scale});
+        const canvas=document.createElement('canvas');
+        canvas.width=svp.width;canvas.height=svp.height;
+        await page.render({canvasContext:canvas.getContext('2d'),viewport:svp}).promise;
+        thumbs.push(canvas.toDataURL('image/jpeg',0.7));
+      }catch(e){console.warn('Could not render page',i,e);thumbs.push(null)}
+    }
+    return{slideCount,titles:new Array(slideCount).fill(''),thumbs};
+  }catch(e){console.error('PDF parse error:',e);alert('Could not parse this PDF.');return null}
+}
+
+window._importData=null; // Holds parsed import data during create flow
+
+// ─── File I/O (File System Access API — Chrome native) ───
+async function saveFile(data){
+  const json=JSON.stringify(data,null,2);
+  const blob=new Blob([json],{type:'application/json'});
+  try{
+    if(!state.fileHandle){
+      state.fileHandle=await window.showSaveFilePicker({suggestedName:`${data.name||'plan'}.json`,types:[{description:'JSON',accept:{'application/json':['.json']}}]});
+    }
+    const w=await state.fileHandle.createWritable();
+    await w.write(blob);
+    await w.close();
+    return true;
+  }catch(e){
+    if(e.name==='AbortError')return false;
+    state.fileHandle=null;
+    // Fallback download
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`${data.name||'plan'}.json`;a.click();URL.revokeObjectURL(a.href);
+    return true;
+  }
+}
+
+function openFile(){
+  return new Promise(res=>{
+    const inp=document.createElement('input');inp.type='file';inp.accept='.json';
+    inp.onchange=()=>{
+      const f=inp.files&&inp.files[0];if(!f){res(null);return}
+      const reader=new FileReader();
+      reader.onload=()=>{try{res(JSON.parse(reader.result))}catch{alert('Invalid file');res(null)}};
+      reader.readAsText(f);
+    };
+    inp.click();
+  });
+}
+
+function exportTiming(name,v){
+  let c=0;const ln=[`Plan: ${name} — Variant: ${v.name}`,`Total Duration: ${fmt(v.totalDuration)}`,''];
+  v.slides.forEach((s,i)=>{c+=s.duration;ln.push(`Slide ${String(i+1).padStart(2,' ')}${s.label?' - '+s.label:''}: ${fmt(c)}`)});
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([ln.join('\n')],{type:'text/plain'}));a.download=`${name}-${v.name}.txt`;a.click();
+}
+
+// ─── Undo/Redo ───
+function pushUndo(){
+  state.hist=[...state.hist.slice(-(MAX_UNDO-1)),deep(state.curPlan.variants)];
+  state.fut=[];
+}
+function undo(){
+  if(!state.hist.length)return;
+  state.fut=[deep(state.curPlan.variants),...state.fut.slice(0,MAX_UNDO-1)];
+  state.curPlan.variants=state.hist.pop();
+  render();
+}
+function redo(){
+  if(!state.fut.length)return;
+  state.hist.push(deep(state.curPlan.variants));
+  state.curPlan.variants=state.fut.shift();
+  render();
+}
+
+// ─── Slide ops ───
+function getAV(){return state.curPlan?.variants.find(v=>v.id===state.actVId)||state.curPlan?.variants.find(v=>!v.hidden)||state.curPlan?.variants[0]}
+
+function setDur(vid,sid,nd){
+  const v=state.curPlan.variants.find(x=>x.id===vid);if(!v)return;
+  const sl=[...v.slides];const i=sl.findIndex(x=>x.id===sid);if(i<0)return;
+  nd=round(clamp(nd,0,v.totalDuration));const d=nd-sl[i].duration;if(!d)return;
+  pushUndo();sl[i]={...sl[i],duration:nd};
+  if(d>0){let r=d;for(let j=i+1;j<sl.length&&r>0;j++){const tk=Math.min(sl[j].duration,r);sl[j]={...sl[j],duration:sl[j].duration-tk};r-=tk}if(r>0)sl[i]={...sl[i],duration:nd-r}}
+  else{for(let j=i+1;j<sl.length;j++){sl[j]={...sl[j],duration:sl[j].duration+(-d)};break}}
+  v.slides=sl;render();
+}
+
+function addSlideAfter(vid,ai){
+  const v=state.curPlan.variants.find(x=>x.id===vid);if(!v||v.slides.length>=MAX_SLIDES)return;
+  pushUndo();const sl=[...v.slides];const p=sl[ai];const tk=p?round(Math.floor(p.duration/2)):STEP;
+  if(p)sl[ai]={...p,duration:p.duration-tk};sl.splice(ai+1,0,mkSlide(tk));v.slides=sl;render();
+}
+
+function addSlideEnd(vid){
+  const v=state.curPlan.variants.find(x=>x.id===vid);if(!v||v.slides.length>=MAX_SLIDES)return;
+  pushUndo();const sl=[...v.slides];const l=sl[sl.length-1];const tk=l?round(Math.floor(l.duration/2)):STEP;
+  if(l)sl[sl.length-1]={...l,duration:l.duration-tk};sl.push(mkSlide(tk));v.slides=sl;render();
+}
+
+function rmSlide(vid,sid){
+  const v=state.curPlan.variants.find(x=>x.id===vid);if(!v||v.slides.length<=1)return;
+  pushUndo();const sl=[...v.slides];const i=sl.findIndex(x=>x.id===sid);if(i<0)return;
+  const rm=sl[i];sl.splice(i,1);const t=i>0?i-1:0;sl[t]={...sl[t],duration:sl[t].duration+rm.duration};
+  v.slides=sl;if(state.selId===sid)state.selId=null;render();
+}
+
+function reorderSlide(vid,fromId,toId){
+  if(!fromId||fromId===toId)return;const v=state.curPlan.variants.find(x=>x.id===vid);if(!v)return;
+  pushUndo();const sl=[...v.slides];const fi=sl.findIndex(x=>x.id===fromId);const ti=sl.findIndex(x=>x.id===toId);
+  if(fi<0||ti<0)return;const[mv]=sl.splice(fi,1);sl.splice(ti,0,mv);v.slides=sl;state.dragId=null;render();
+}
+
+// ─── Variant ops ───
+function cloneVariant(vid){
+  pushUndo();const src=state.curPlan.variants.find(v=>v.id===vid);if(!src)return;
+  const c={...deep(src),id:uid(),name:src.name+' (copy)',hidden:false};
+  const i=state.curPlan.variants.findIndex(v=>v.id===vid);
+  state.curPlan.variants.splice(i+1,0,c);state.actVId=c.id;render();
+}
+
+let hideConfirm=null;
+function toggleHide(vid){
+  if(hideConfirm===vid){
+    pushUndo();const v=state.curPlan.variants.find(x=>x.id===vid);v.hidden=!v.hidden;hideConfirm=null;
+    if(state.actVId===vid&&v.hidden){const vis=state.curPlan.variants.find(x=>x.id!==vid&&!x.hidden);if(vis)state.actVId=vis.id}
+    render();
+  }else{hideConfirm=vid;render();setTimeout(()=>{hideConfirm=null;render()},3000)}
+}
+
+// ═══════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════
+
+function render(){
+  const app=$('#app');
+  if(state.screen==='home')renderHome(app);
+  else if(state.screen==='create')renderCreate(app);
+  else if(state.screen==='editor')renderEditor(app);
+}
+
+// ─── HOME ───
+function renderHome(app){
+  const plans=state.plans;
+  let h=`<div class="page"><div class="col">
+    <div class="text-c"><div class="hero-icon">⏱</div><h1 class="hero-t">PrezTimingTool</h1><p class="hero-s">Nail your presentation pace, every time</p></div>
+    <div class="flex items-c justify-c gap-8">
+      <button class="bp" onclick="goCreate()" data-tip="Create a new timing plan">${ic('plus')} New Plan</button>
+      <button class="bs" onclick="doImport()" data-tip="Import a previously saved .json plan">${ic('file',16)} Import</button>
+    </div>`;
+  if(plans.length){
+    h+=`<div class="mt-20"><div class="sec-l">Your Plans</div><div class="flex flex-col gap-8">`;
+    plans.forEach((p,pi)=>{
+      const vc=p.variants?p.variants.filter(v=>!v.hidden).length:0;
+      h+=`<div class="plan-row" onclick="loadPlan('${p.id}')" data-tip="Open this plan">
+        <div class="plan-icon" style="background:linear-gradient(135deg,${COLORS[pi%COLORS.length]},#fff)">${vc}</div>
+        <div class="flex-1"><div style="font-size:15px;font-weight:700">${esc(p.name)}</div><div style="font-size:12px;color:var(--td);margin-top:2px">${p.variants?.length||0} variant${(p.variants?.length||0)!==1?'s':''} · ${new Date(p.createdAt).toLocaleDateString()}</div></div>
+        <button class="icon-btn" onclick="event.stopPropagation();delPlan('${p.id}')" data-tip="Delete this plan">${ic('trash',15)}</button>
+      </div>`;
+    });
+    h+=`</div></div>`;
+  }
+  h+=`</div></div>`;
+  app.innerHTML=h;
+}
+
+function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML}
+
+// ─── CREATE ───
+function renderCreate(app){
+  const ns=window._ns||10,nm=window._nm||15,nc=window._nc||0,nn=window._nn||'';
+  const tot=nm*60+nc;
+  const id=window._importData;
+  const sc=id?id.slideCount:ns;
+  const per=sc>0?round(Math.floor(tot/sc)):0;
+  let impHtml='';
+  if(id){
+    const hasThumbs=id.thumbs.some(t=>t!==null);
+    impHtml='<div style="padding:12px 16px;background:var(--ab);border:1px solid var(--abr);border-radius:10px;margin-bottom:16px">';
+    impHtml+='<div class="flex items-c gap-8" style="margin-bottom:8px">';
+    impHtml+='<span style="font-size:13px;font-weight:700;color:var(--ac)">✓ '+id.slideCount+' slides imported'+(hasThumbs?' with thumbnails':'')+'</span>';
+    impHtml+='<button class="bi" onclick="window._importData=null;renderCreate(document.querySelector(&quot;#app&quot;))" data-tip="Remove import" style="margin-left:auto;color:var(--coral)">'+ic('trash',14)+'</button>';
+    impHtml+='</div><div class="pptx-preview">';
+    for(let i=0;i<id.slideCount;i++){
+      const t=id.thumbs[i];const lbl=id.titles[i]||'Slide '+(i+1);
+      impHtml+='<div class="pptx-thumb" data-tip="'+esc(lbl)+'">';
+      if(t)impHtml+='<img src="'+t+'" alt="Slide '+(i+1)+'" draggable="false">';
+      else impHtml+='<div style="width:100%;aspect-ratio:16/9;background:var(--sa);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:var(--ac)">'+(i+1)+'</div>';
+      impHtml+='<div class="pptx-thumb-label">'+esc(lbl)+'</div></div>';
+    }
+    impHtml+='</div></div>';
+  }
+  app.innerHTML=`<div class="page"><div class="col">
+    <button class="bk" onclick="goHome()" data-tip="Back to all plans">${ic('chevL')} Back</button>
+    <div class="card">
+      <div class="flex items-c gap-8 mb-24" style="color:var(--ac)">${ic('clock')} <h2 style="font-size:24px;font-weight:800;color:var(--tx)">New Timing Plan</h2></div>
+      <div class="fg"><label class="fl">Plan name</label><input class="fi" id="fn" value="${esc(nn)}" placeholder="e.g. CMA Board Presentation" maxlength="60" oninput="window._nn=this.value"></div>
+      ${!id?`<div class="fg"><label class="fl">Import from presentation (optional)</label>
+        <div class="flex gap-8">
+          <button class="bs" style="flex:1" onclick="pickFile('.pdf')" data-tip="Import PDF for slide count + visual thumbnails">📄 Import PDF <span style="font-size:10px;color:var(--green);font-weight:700;margin-left:4px">+ thumbnails</span></button>
+          <button class="bs" style="flex:1" onclick="pickFile('.pptx')" data-tip="Import PPTX for slide count + titles (no thumbnails)">📊 Import PPTX <span style="font-size:10px;color:var(--td);font-weight:600;margin-left:4px">titles only</span></button>
+        </div>
+        <div style="font-size:11px;color:var(--td);margin-top:6px;text-align:center">💡 Export your PowerPoint as PDF first for visual slide previews on the timeline</div>
+      </div>`:''}
+      ${impHtml}
+      <div class="row">
+        <div class="fg"><label class="fl">Slides</label><input class="fi" type="number" id="fs" value="${sc}" min="1" max="${MAX_SLIDES}" ${id?'disabled':''} oninput="window._ns=Math.max(1,Math.min(${MAX_SLIDES},parseInt(this.value)||1));renderCreate($('#app'))"></div>
+        <div class="fg"><label class="fl">Minutes</label><input class="fi" type="number" id="fm" value="${nm}" min="0" oninput="window._nm=Math.max(0,parseInt(this.value)||0);renderCreate($('#app'))"></div>
+        <div class="fg"><label class="fl">Seconds</label><input class="fi" type="number" id="fc" value="${nc}" min="0" max="59" step="${STEP}" oninput="window._nc=Math.max(0,Math.min(59,parseInt(this.value)||0));renderCreate($('#app'))"></div>
+      </div>
+      <div class="prev"><strong>${fmt(tot)}</strong> total <span style="opacity:.4">·</span> <strong>${sc}</strong> slides <span style="opacity:.4">·</span> ~<strong>${fmtD(per)}</strong>/slide</div>
+      <button class="bp" onclick="doCreate()">Create Plan</button>
+    </div>
+  </div></div>`;
+}
+
+
+// ─── EDITOR ───
+function renderEditor(app){
+  const p=state.curPlan;if(!p)return;
+  const vars=p.variants;
+  const av=getAV();
+  const visV=vars.filter(v=>!v.hidden);
+  const hidV=vars.filter(v=>v.hidden);
+
+  // Diff map
+  const dm=new Map();
+  if(visV.length>=2){const base=visV[0];visV.slice(1).forEach(v=>{v.slides.forEach((s,i)=>{if(i<base.slides.length&&s.duration!==base.slides[i].duration)dm.set(v.id+'-'+i,s.duration>base.slides[i].duration?'more':'less')})})}
+
+  let h=`<div class="ed-page">
+    <div class="top-bar">
+      <button class="bk" onclick="goHome()" data-tip="Back to all plans">${ic('chevL')} Plans</button>
+      <input class="top-nm" value="${esc(p.name)}" maxlength="60" oninput="state.curPlan.name=this.value" title="Plan name — click to edit">
+      <div class="flex items-c gap-6">
+        <button class="bt" onclick="undo()" ${state.hist.length?'':'disabled'} data-tip="Undo last change">${ic('undo')}</button>
+        <button class="bt" onclick="redo()" ${state.fut.length?'':'disabled'} data-tip="Redo">${ic('redo')}</button>
+        <div style="width:1px;height:20px;background:var(--bd);margin:0 4px"></div>
+        <button class="bt" onclick="doSave()" data-tip="Save plan to file">${ic('save')}</button>
+      </div>
+    </div>
+    <div class="var-area">`;
+
+  visV.forEach(v=>{
+    const isAct=v.id===state.actVId;
+    const used=v.slides.reduce((a,s)=>a+s.duration,0);
+    h+=`<div class="v-row ${isAct?'active':''}" onclick="state.actVId='${v.id}';render()">
+      <div class="v-head">
+        <input class="v-nm" value="${esc(v.name)}" maxlength="30" onclick="event.stopPropagation()" oninput="state.curPlan.variants.find(x=>x.id==='${v.id}').name=this.value" title="Variant name">
+        <span class="badge" data-tip="Total duration">${fmt(v.totalDuration)}</span>
+        <span class="badge-d" data-tip="Number of slides">${v.slides.length} slides</span>`;
+    if(used!==v.totalDuration){
+      const over=used>v.totalDuration;
+      h+=`<span class="badge" style="background:${over?'#fef2f2':'#fffbeb'};color:${over?'var(--coral)':'var(--gold)'}" data-tip="Time difference">${over?'+':'-'}${fmtD(Math.abs(v.totalDuration-used))}</span>`;
+    }
+    h+=`<span class="flex-1"></span>`;
+    if(isAct){
+      h+=`<button class="bi" onclick="event.stopPropagation();openDurModal()" data-tip="Adjust total duration">${ic('gear')}</button>`;
+      h+=`<button class="bi" onclick="event.stopPropagation();addSlideEnd('${v.id}')" ${v.slides.length>=MAX_SLIDES?'disabled':''} data-tip="Add slide at end">${ic('plus',15)}</button>`;
+      h+=`<button class="bi" onclick="event.stopPropagation();doExport('${v.id}')" data-tip="Export timing as text file">${ic('down')}</button>`;
+    }
+    h+=`<button class="bi" onclick="event.stopPropagation();cloneVariant('${v.id}')" data-tip="Clone this variant">${ic('copy',15)}</button>`;
+    h+=`<button class="bi" onclick="event.stopPropagation();toggleHide('${v.id}')" style="color:${hideConfirm===v.id?'var(--coral)':'var(--td)'}" data-tip="${hideConfirm===v.id?'Click again to confirm':'Hide this variant'}">${hideConfirm===v.id?'<span style="font-size:11px;font-weight:700">Hide?</span>':ic('eyeOff')}</button>`;
+    h+=`</div>`;
+
+    // Timeline
+    h+=renderTimeline(v,isAct,dm);
+
+    // Detail panel under active variant
+    if(isAct&&state.selId){
+      const si=v.slides.findIndex(s=>s.id===state.selId);
+      const ss=v.slides[si];
+      if(ss){
+        h+=`<div class="det-bar">
+          <div class="flex items-c gap-8" style="min-width:160px">
+            <div class="sl-big">${si+1}</div>
+            <div>
+              <label class="fl" style="margin-bottom:2px;display:block">Label</label>
+              <input class="fi fi-sm" value="${esc(ss.label)}" placeholder="e.g. Intro" maxlength="${MAX_LABEL}" oninput="setLabel('${v.id}','${ss.id}',this.value)" title="Slide label" style="width:120px">
+            </div>
+          </div>
+          <div class="flex-1 flex flex-col" style="gap:4px">
+            <div class="flex items-c gap-8">
+              <span class="fl" style="margin:0;min-width:58px">Duration</span>
+              <input type="range" min="0" max="${v.totalDuration}" step="${STEP}" value="${ss.duration}" oninput="setDur('${v.id}','${ss.id}',parseInt(this.value));render()" title="Drag to adjust duration" style="flex:1;accent-color:var(--ac);height:6px">
+              <input class="fi fi-sm fi-mono" value="${fmt(ss.duration)}" style="width:72px" onblur="commitDur('${v.id}','${ss.id}',this.value)" onkeydown="if(event.key==='Enter')commitDur('${v.id}','${ss.id}',this.value)" title="Type duration as mm:ss">
+            </div>
+            ${ss.duration===0?'<div style="font-size:12px;color:var(--gold);font-weight:600">⚠ Hidden (0 duration)</div>':''}
+          </div>
+          <div class="flex gap-6">
+            ${v.slides.length<MAX_SLIDES?`<button class="bd" onclick="addSlideAfter('${v.id}',${si})" data-tip="Insert slide after this one">${ic('plus',15)}</button>`:''}
+            ${v.slides.length>1?`<button class="bd" style="color:var(--coral)" onclick="rmSlide('${v.id}','${ss.id}')" data-tip="Remove this slide">${ic('trash',15)}</button>`:''}
+          </div>
+        </div>`;
+      }
+    }
+    h+=`</div>`;
+  });
+
+  // Hidden variants
+  if(hidV.length){
+    h+=`<div class="mt-8"><div class="sec-l">Hidden Variants</div><div class="flex gap-8" style="flex-wrap:wrap">`;
+    hidV.forEach(v=>{
+      h+=`<button class="hid-pill" onclick="toggleHide('${v.id}')" data-tip="Click to show this variant">${ic('eye')} ${esc(v.name)}${hideConfirm===v.id?' <span style="color:var(--ac);font-weight:700;margin-left:4px">Show?</span>':''}</button>`;
+    });
+    h+=`</div></div>`;
+  }
+
+  h+=`</div></div>`;
+  app.innerHTML=h;
+}
+
+function renderTimeline(v,isAct,dm){
+  const sl=v.slides,tot=v.totalDuration;
+  let cum=0;const pos=sl.map(s=>{const st=cum;cum+=s.duration;return{st,end:cum,pct:tot>0?(s.duration/tot)*100:0}});
+  const ms=tot<=120?30:tot<=300?60:tot<=900?120:300;
+  let h=`<div class="tl-out"><div class="tl-mk">`;
+  for(let t=0;t<=tot;t+=ms){
+    h+=`<div style="position:absolute;left:${(t/tot)*100}%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center"><div style="width:1px;height:6px;background:var(--bd)"></div><span class="tl-mk-l">${fmt(t)}</span></div>`;
+  }
+  h+=`</div><div class="tl-tk" data-vid="${v.id}">`;
+  sl.forEach((s,i)=>{
+    const z=s.duration===0;const sel=s.id===state.selId&&isAct;
+    const dk=v.id+'-'+i;const diff=dm.get(dk);
+    let bg='';if(diff==='more')bg='background:var(--diff-more);';if(diff==='less')bg='background:var(--diff-less);';
+    if(sel)bg='background:var(--ab);';
+    const w=z?'width:8px':'width:max(60px,calc('+pos[i].pct+'vw * 0.82))';
+    h+=`<div class="flex items-c shrink-0" style="align-items:stretch">`;
+    h+=`<div class="sl ${sel?'sel':''} ${z?'zero':''}" style="${w};${bg}" draggable="true"
+      data-sid="${s.id}" data-vid="${v.id}"
+      onclick="event.stopPropagation();state.actVId='${v.id}';state.selId='${s.id}';render()"
+      ondragstart="state.dragId='${s.id}'" ondragover="event.preventDefault()" ondrop="reorderSlide('${v.id}','${state.dragId}','${s.id}')"
+      data-tip="Slide ${i+1}${s.label?' — '+s.label:''} · ${fmtD(s.duration)} · ends ${fmt(pos[i].end)}">`;
+    if(!z){
+      h+=`<div class="sl-grip">${ic('grip')}</div>`;
+      h+=`<div class="sl-n">${i+1}</div>`;
+      if(s.thumb)h+=`<img class="sl-thumb" src="${s.thumb}" alt="Slide ${i+1}" draggable="false">`;
+      h+=`<div class="sl-l">${s.label||'<span style="opacity:.25">—</span>'}</div>`;
+      h+=`<div class="sl-d">${fmtD(s.duration)}</div>`;
+      h+=`<div class="sl-c">${fmt(pos[i].end)}</div>`;
+    }else{
+      h+=`<div style="writing-mode:vertical-rl;font-size:9px;color:var(--td);font-weight:700">${i+1}</div>`;
+    }
+    h+=`</div>`;
+    if(i<sl.length-1){
+      h+=`<div class="div-h" data-div="${i}" data-vid="${v.id}" data-tip="Drag to redistribute time" onmousedown="startDivDrag(event,'${v.id}',${i})"><div class="div-l"></div></div>`;
+    }
+    h+=`</div>`;
+  });
+  h+=`</div></div>`;
+  return h;
+}
+
+// ─── Divider drag ───
+let divState=null;
+function startDivDrag(e,vid,idx){
+  e.preventDefault();e.stopPropagation();
+  const v=state.curPlan.variants.find(x=>x.id===vid);if(!v)return;
+  const track=e.target.closest('.tl-tk');if(!track)return;
+  divState={vid,idx,startX:e.clientX,startDurs:v.slides.map(s=>s.duration),track,tot:v.totalDuration};
+  document.body.style.cursor='col-resize';
+  document.addEventListener('mousemove',onDivMove);
+  document.addEventListener('mouseup',onDivUp);
+}
+function onDivMove(e){
+  if(!divState)return;
+  const{idx,startX,startDurs,track,tot}=divState;
+  const tw=track.scrollWidth;const pps=tw/tot;
+  const dx=e.clientX-startX;const ds=round(dx/pps);
+  const oL=startDurs[idx],oR=startDurs[idx+1];
+  const nL=clamp(oL+ds,0,oL+oR);
+  // Visual preview via direct DOM (fast, no re-render)
+  const blocks=track.querySelectorAll('.sl');
+  if(blocks[idx])blocks[idx].querySelector('.sl-d').textContent=fmtD(nL);
+  if(blocks[idx+1])blocks[idx+1].querySelector('.sl-d').textContent=fmtD(oL+oR-nL);
+}
+function onDivUp(e){
+  document.removeEventListener('mousemove',onDivMove);
+  document.removeEventListener('mouseup',onDivUp);
+  document.body.style.cursor='';
+  if(!divState)return;
+  const{vid,idx,startX,startDurs,track,tot}=divState;
+  const tw=track.scrollWidth;const pps=tw/tot;
+  const dx=e.clientX-startX;const ds=round(dx/pps);
+  divState=null;
+  if(ds===0){render();return}
+  const oL=startDurs[idx],oR=startDurs[idx+1];
+  const nL=clamp(oL+ds,0,oL+oR);
+  const v=state.curPlan.variants.find(x=>x.id===vid);
+  if(!v)return;
+  pushUndo();
+  v.slides[idx].duration=nL;
+  v.slides[idx+1].duration=oL+oR-nL;
+  render();
+}
+
+// ─── Global funcs for HTML onclick ───
+window.goHome=()=>{state.screen='home';state.fileHandle=null;render()};
+window.goCreate=()=>{window._nn='';window._ns=10;window._nm=15;window._nc=0;window._importData=null;state.screen='create';render()};
+window.pickFile=(accept)=>{
+  const inp=document.createElement('input');inp.type='file';inp.accept=accept;
+  inp.onchange=()=>{const f=inp.files&&inp.files[0];if(f)handleImportFile(f)};
+  inp.click();
+};
+window.handleImportFile=async(file)=>{
+  const name=file.name.toLowerCase();
+  let data=null;
+  if(name.endsWith('.pdf')){
+    data=await parsePdf(file);
+  }else if(name.endsWith('.pptx')){
+    data=await parsePptx(file);
+  }else{alert('Please select a .pdf or .pptx file');return}
+  if(data){
+    window._importData=data;
+    window._ns=data.slideCount;
+    if(!window._nn)window._nn=file.name.replace(/\.(pptx|pdf)$/i,'');
+    renderCreate($('#app'));
+  }
+};
+window.doCreate=()=>{
+  const id=window._importData;
+  const slideCount=id?id.slideCount:clamp(window._ns||10,1,MAX_SLIDES);
+  const tot=(window._nm||15)*60+round(window._nc||0);if(tot<STEP)return;
+  const per=round(Math.floor(tot/slideCount));
+  const slides=[];
+  for(let i=0;i<slideCount;i++){
+    const dur=i===slideCount-1?tot-per*(slideCount-1):per;
+    const label=id&&id.titles[i]?id.titles[i]:'';
+    const thumb=id&&id.thumbs[i]?id.thumbs[i]:null;
+    slides.push(mkSlide(dur,label,thumb));
+  }
+  const plan={id:uid(),name:window._nn||'Untitled',createdAt:Date.now(),variants:[{id:uid(),name:'Default',slides,totalDuration:tot,hidden:false}]};
+  state.plans.push(plan);state.curPlan=plan;state.actVId=plan.variants[0].id;state.selId=null;state.hist=[];state.fut=[];state.fileHandle=null;state.screen='editor';window._importData=null;render();
+};
+window.loadPlan=id=>{
+  const p=state.plans.find(x=>x.id===id);if(!p)return;
+  state.curPlan=deep(p);state.actVId=p.variants[0]?.id;state.selId=null;state.hist=[];state.fut=[];state.fileHandle=null;state.screen='editor';render();
+};
+window.delPlan=id=>{if(!confirm('Delete this plan permanently?'))return;state.plans=state.plans.filter(p=>p.id!==id);render()};
+window.doImport=async()=>{const d=await openFile();if(d&&d.id&&d.variants){state.plans.push(d);state.curPlan=deep(d);state.actVId=d.variants[0]?.id;state.selId=null;state.hist=[];state.fut=[];state.fileHandle=null;state.screen='editor';render()}};
+window.doSave=async()=>{
+  const data=deep(state.curPlan);
+  const ok=await saveFile(data);
+  if(ok){
+    // Also update local plans array
+    const i=state.plans.findIndex(p=>p.id===data.id);
+    if(i>=0)state.plans[i]=data;else state.plans.push(data);
+  }
+};
+window.doExport=vid=>{const v=state.curPlan.variants.find(x=>x.id===vid);if(v)exportTiming(state.curPlan.name,v)};
+window.setLabel=(vid,sid,l)=>{
+  const v=state.curPlan.variants.find(x=>x.id===vid);if(!v)return;
+  const s=v.slides.find(x=>x.id===sid);if(s)s.label=l.slice(0,MAX_LABEL);
+};
+window.commitDur=(vid,sid,val)=>{setDur(vid,sid,round(parseT(val)));render()};
+window.openDurModal=()=>{
+  const av=getAV();if(!av)return;
+  const m=Math.floor(av.totalDuration/60),s=av.totalDuration%60;
+  const ov=el('div','overlay');
+  ov.onclick=e=>{if(e.target===ov)ov.remove()};
+  ov.innerHTML=`<div class="modal">
+    <h3 style="font-size:20px;font-weight:800;margin:0 0 4px">Adjust Total Duration</h3>
+    <p style="font-size:14px;color:var(--td);margin:0 0 20px">Current: ${fmt(av.totalDuration)}</p>
+    <div class="row mb-20">
+      <div class="fg"><label class="fl">Minutes</label><input class="fi" type="number" id="dm-min" value="${m}" min="0"></div>
+      <div class="fg"><label class="fl">Seconds</label><input class="fi" type="number" id="dm-sec" value="${s}" min="0" max="59" step="${STEP}"></div>
+    </div>
+    <label class="fl">Distribute the difference</label>
+    <div class="flex gap-8" style="margin:8px 0 24px">
+      <button class="pill active" id="dm-eq" onclick="this.classList.add('active');document.getElementById('dm-last').classList.remove('active')">Equally across all</button>
+      <button class="pill" id="dm-last" onclick="this.classList.add('active');document.getElementById('dm-eq').classList.remove('active')">Add to last slide</button>
+    </div>
+    <div class="flex gap-8 justify-e">
+      <button class="bs" onclick="this.closest('.overlay').remove()">Cancel</button>
+      <button class="bp" onclick="applyDurModal()">Apply</button>
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
+};
+window.applyDurModal=()=>{
+  const av=getAV();if(!av)return;
+  const nt=(parseInt($('#dm-min').value)||0)*60+round(parseInt($('#dm-sec').value)||0);
+  if(nt<STEP)return;pushUndo();
+  const diff=nt-av.totalDuration;const eq=$('#dm-eq').classList.contains('active');
+  if(eq){const per=round(Math.floor(diff/av.slides.length));const rem=diff-per*av.slides.length;av.slides.forEach((s,i)=>{s.duration=Math.max(0,s.duration+per+(i===av.slides.length-1?rem:0))})}
+  else{av.slides[av.slides.length-1].duration=Math.max(0,av.slides[av.slides.length-1].duration+diff)}
+  av.totalDuration=nt;$('.overlay')?.remove();render();
+};
+
+// Expose needed functions
+window.undo=undo;window.redo=redo;
+window.setDur=setDur;window.addSlideAfter=addSlideAfter;window.addSlideEnd=addSlideEnd;window.rmSlide=rmSlide;
+window.reorderSlide=reorderSlide;window.cloneVariant=cloneVariant;window.toggleHide=toggleHide;
+window.startDivDrag=startDivDrag;window.state=state;
+
+// ─── INIT ───
+initTips();
+render();
+</script>
 </body>
 </html>
