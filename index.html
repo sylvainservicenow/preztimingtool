@@ -59,17 +59,18 @@ button:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
 .bk:hover{color:var(--tx)}
 .bi{color:var(--td);padding:4px;border-radius:6px;display:flex}
 .bi:hover{color:var(--tx);background:var(--sa)}
-.bt{background:none;border:1.5px solid var(--bd);border-radius:var(--rs);padding:6px 10px;color:var(--tx);display:flex;align-items:center;gap:5px;font-size:13px;font-weight:600;transition:background .15s}
+.bt{background:none;border:1.5px solid var(--bd);border-radius:var(--rs);padding:8px 14px;color:var(--tx);display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;transition:background .15s}
 .bt:hover{background:var(--sa)}
 .bt[disabled]{opacity:.35;pointer-events:none}
+.bt .bt-label{font-size:12px;font-weight:600}
 .bd{background:var(--sa);border:1.5px solid var(--bd);border-radius:var(--rs);padding:7px 12px;display:flex;align-items:center;gap:4px;color:var(--tm);font-size:13px;font-weight:600}
 .bd:hover{background:var(--bl)}
 .pill{background:var(--sa);border:1.5px solid var(--bd);border-radius:var(--rs);padding:8px 16px;font-size:13px;font-weight:600;color:var(--tx)}
 .pill.active{background:var(--ab);border-color:var(--ac);color:var(--ac)}
 .sec-l{font-size:11px;font-weight:700;color:var(--td);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:8px}
 .prev{display:flex;align-items:center;gap:8px;padding:10px 16px;background:var(--ab);border-radius:10px;margin-bottom:20px;font-family:var(--m);font-size:13px;color:var(--ac);font-weight:500;border:1px solid var(--abr)}
-.badge{font-size:12px;font-weight:600;font-family:var(--m);color:var(--ac);background:var(--ab);padding:2px 8px;border-radius:6px;display:inline-block}
-.badge-d{font-size:12px;font-weight:500;color:var(--td);background:var(--sa);padding:2px 8px;border-radius:6px;border:1px solid var(--bd);display:inline-block}
+.badge{font-size:14px;font-weight:600;font-family:var(--m);color:var(--ac);background:var(--ab);padding:4px 10px;border-radius:8px;display:inline-block}
+.badge-d{font-size:14px;font-weight:500;color:var(--td);background:var(--sa);padding:4px 10px;border-radius:8px;border:1px solid var(--bd);display:inline-block}
 
 /* ── Home ── */
 .hero-icon{font-size:64px;margin-bottom:8px;animation:sttFloat 3s ease-in-out infinite}
@@ -84,42 +85,68 @@ button:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
 
 /* ── Editor ── */
 .ed-page{min-height:100vh;display:flex;flex-direction:column}
-.top-bar{display:flex;align-items:center;gap:12px;padding:10px 24px;background:rgba(255,255,255,.88);backdrop-filter:blur(12px);border-bottom:1px solid var(--bl);position:sticky;top:0;z-index:100}
-.top-nm{background:none;border:none;color:var(--tx);font-size:18px;font-weight:800;font-family:var(--f);outline:none;flex:1;min-width:0}
-.var-area{padding:20px 24px;display:flex;flex-direction:column;gap:16px;flex:1;overflow:auto}
-.v-row{background:var(--sf);border-radius:14px;box-shadow:var(--sh);border:1.5px solid transparent;overflow:hidden;transition:border-color .2s}
+.top-bar{display:flex;align-items:center;gap:16px;padding:14px 28px;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--bl);position:sticky;top:0;z-index:100}
+.top-nm{background:none;border:none;color:var(--tx);font-size:22px;font-weight:800;font-family:var(--f);outline:none;flex:1;min-width:0}
+.var-area{padding:24px 28px;display:flex;flex-direction:column;gap:20px;flex:1;overflow:auto}
+.v-row{background:var(--sf);border-radius:16px;box-shadow:var(--sh);border:1.5px solid transparent;overflow:hidden;transition:border-color .2s}
 .v-row.active{border-color:var(--ac);box-shadow:0 0 0 1px var(--abr),var(--sh)}
-.v-head{display:flex;align-items:center;gap:8px;padding:10px 16px;background:var(--sa);border-bottom:1px solid var(--bl);cursor:pointer}
-.v-nm{background:none;border:none;color:var(--tx);font-size:14px;font-weight:700;font-family:var(--f);outline:none;width:120px}
+.v-head{display:flex;align-items:center;gap:10px;padding:14px 20px;background:var(--sa);border-bottom:1px solid var(--bl);cursor:pointer}
+.v-nm{background:none;border:none;color:var(--tx);font-size:16px;font-weight:700;font-family:var(--f);outline:none;width:150px}
 
 /* ── Timeline ── */
-.tl-out{padding:8px 16px 10px;overflow-x:auto;overflow-y:hidden}
-.tl-mk{position:relative;height:22px;margin-bottom:2px}
-.tl-mk-l{font-size:10px;color:var(--td);font-family:var(--m);font-weight:500;margin-top:1px}
-.tl-tk{display:flex;align-items:stretch;min-height:110px}
-.sl{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:8px 6px;background:var(--sf);border-radius:10px;border:1.5px solid var(--bd);cursor:pointer;transition:border-color .15s,box-shadow .15s,background .15s;overflow:hidden;position:relative;min-height:100px;box-sizing:border-box;user-select:none;flex-shrink:0}
+.tl-out{padding:12px 20px 14px;overflow-x:auto;overflow-y:hidden}
+.tl-inner{display:inline-flex;flex-direction:column;min-width:100%}
+.tl-grid{min-width:100%}
+.tl-mk{position:relative;height:26px;margin-bottom:4px}
+.tl-mk-l{font-size:11px;color:var(--td);font-family:var(--m);font-weight:500;margin-top:2px}
+.sl{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:10px 8px;background:var(--sf);border-radius:12px;border:1.5px solid var(--bd);cursor:pointer;transition:border-color .15s,box-shadow .15s,background .15s;overflow:hidden;position:relative;min-height:140px;box-sizing:border-box;user-select:none}
 .sl.sel{border-color:var(--ac);background:var(--ab);box-shadow:0 0 0 2px var(--abr)}
 .sl.zero{background:var(--sa);opacity:.4;min-width:8px;max-width:8px;padding:0;border-radius:4px;display:flex;align-items:center;justify-content:center}
-.sl-grip{position:absolute;top:4px;left:3px;cursor:grab;color:var(--td)}
-.sl-n{font-size:20px;font-weight:800;color:var(--ac);line-height:1}
-.sl-l{font-size:11px;color:var(--tm);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center;min-height:14px}
-.sl-d{font-size:13px;font-family:var(--m);color:var(--tx);font-weight:600}
-.sl-c{font-size:10px;font-family:var(--m);color:var(--td);font-weight:500}
-.sl-thumb{width:90%;max-width:80px;aspect-ratio:16/9;border-radius:4px;object-fit:cover;border:1px solid var(--bd);margin:2px 0}
+.sl-grip{position:absolute;top:6px;left:4px;cursor:grab;color:var(--td)}
+.sl-n{font-size:24px;font-weight:800;color:var(--ac);line-height:1}
+.sl-l{font-size:12px;color:var(--tm);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center;min-height:16px}
+.sl-d{font-size:14px;font-family:var(--m);color:var(--tx);font-weight:600}
+.sl-c{font-size:11px;font-family:var(--m);color:var(--td);font-weight:500}
+.sl-thumb{width:92%;max-width:100px;aspect-ratio:16/9;border-radius:5px;object-fit:cover;border:1px solid var(--bd);margin:3px 0}
 .pptx-drop{border:2px dashed var(--bd);border-radius:12px;padding:24px;text-align:center;transition:border-color .2s,background .2s;cursor:pointer}
 .pptx-drop:hover,.pptx-drop.over{border-color:var(--ac);background:var(--ab)}
 .pptx-preview{display:flex;gap:8px;overflow-x:auto;padding:12px 0;margin-top:12px}
 .pptx-thumb{width:80px;flex-shrink:0;border-radius:6px;overflow:hidden;border:1.5px solid var(--bd);background:var(--sf)}
 .pptx-thumb img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block}
 .pptx-thumb-label{font-size:9px;padding:2px 4px;color:var(--td);text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.div-h{width:14px;cursor:col-resize;display:flex;align-items:center;justify-content:center;z-index:10;flex-shrink:0}
+.div-h{width:18px;cursor:col-resize;display:flex;align-items:center;justify-content:center;z-index:10;flex-shrink:0;position:relative}
 .div-l{width:2px;height:50%;border-radius:2px;background:var(--bd);transition:background .15s,width .15s}
 .div-h:hover .div-l,.div-l.dragging{background:var(--ac);width:3px}
 
+/* ── Sections ── */
+.sec-block{display:flex;align-items:center;justify-content:center;gap:8px;padding:10px 14px;cursor:pointer;font-size:14px;font-weight:600;transition:all .15s;border:1.5px solid transparent;position:relative;min-width:60px;border-radius:8px}
+.sec-block:first-child{border-radius:10px 0 0 10px}
+.sec-block:last-of-type{border-radius:0 10px 10px 0}
+.sec-block:only-of-type{border-radius:10px}
+.sec-block:hover{filter:brightness(0.95)}
+.sec-block.sel{border-color:var(--ac);box-shadow:0 0 0 2px var(--abr);z-index:2}
+.sec-block .sec-name{max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:700}
+.sec-block .sec-time{font-family:var(--m);font-size:13px;opacity:.7}
+.sec-block .sec-slides{font-size:11px;opacity:.5}
+.sec-split{width:28px;display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;position:relative;z-index:3}
+.sec-split-btn{width:24px;height:24px;border-radius:6px;background:var(--sf);border:1.5px solid var(--bd);color:var(--td);font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;transition:all .15s;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.sec-split-btn:hover{border-color:var(--ac);color:var(--ac);transform:scale(1.1);box-shadow:0 2px 8px rgba(124,92,245,.2)}
+.sec-det{padding:14px 20px;border-top:1px solid var(--bl);background:var(--sa);display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.sec-colors-0{background:#e8f5e9;color:#2e7d32}.sec-colors-1{background:#e3f2fd;color:#1565c0}.sec-colors-2{background:#fff3e0;color:#e65100}.sec-colors-3{background:#f3e5f5;color:#7b1fa2}.sec-colors-4{background:#fce4ec;color:#c62828}.sec-colors-5{background:#e0f7fa;color:#00695c}.sec-colors-6{background:#fff8e1;color:#f57f17}.sec-colors-7{background:#efebe9;color:#4e342e}
+/* Section split button between slides (bottom of cards) */
+.div-h .sec-brk{display:none!important}
+/* Home action cards */
+.home-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.home-act{display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px 14px;background:var(--sf);border:1.5px solid var(--bd);border-radius:12px;cursor:pointer;transition:all .15s;flex:1;min-width:120px;max-width:160px;text-align:center}
+.home-act:hover{border-color:var(--ac);transform:translateY(-2px);box-shadow:var(--sh)}
+.home-act .ha-icon{font-size:28px}
+.home-act .ha-label{font-size:13px;font-weight:700;color:var(--tx)}
+.home-act .ha-sub{font-size:10px;color:var(--td);font-weight:500}
+
 /* ── Detail ── */
-.det-bar{padding:12px 16px;border-top:1px solid var(--bl);background:var(--sa);display:flex;align-items:center;gap:20px}
-.det-bar .sl-big{font-size:28px;font-weight:800;color:var(--ac);line-height:1}
-.det-bar input[type=range]{flex:1;accent-color:var(--ac);cursor:pointer;height:6px}
+.det-bar{padding:16px 20px;border-top:1px solid var(--bl);background:var(--sa);display:flex;align-items:center;gap:24px}
+.det-bar .sl-big{font-size:32px;font-weight:800;color:var(--ac);line-height:1}
+.det-bar input[type=range]{flex:1;accent-color:var(--ac);cursor:pointer;height:8px}
 
 /* ── Modal ── */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.2);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:1000}
@@ -194,12 +221,132 @@ function initTips(){
 }
 
 // ─── State ───
-let state={screen:'home',plans:[],curPlan:null,actVId:null,selId:null,hist:[],fut:[],dragId:null,fileHandle:null};
+let state={screen:'home',plans:[],curPlan:null,actVId:null,selId:null,selSecId:null,hist:[],fut:[],dragId:null,fileHandle:null};
 
 function mkSlide(d,label,thumb){return{id:uid(),duration:d,label:label||'',thumb:thumb||null}}
+function mkSection(name,startIdx,endIdx){return{id:uid(),name:name||'Section',startIdx,endIdx}}
 function initSlides(n,tot){const p=round(Math.floor(tot/n));const sl=Array.from({length:n},()=>mkSlide(p));const u=p*n;if(u<tot)sl[sl.length-1].duration+=tot-u;return sl}
 
-// ─── PPTX Parser (titles only, no thumbnails) ───
+// ─── Section operations ───
+function getSections(v){return v.sections||[]}
+function ensureSections(v){
+  if(!v.sections||!v.sections.length){
+    v.sections=[mkSection('Full Presentation',0,v.slides.length-1)];
+  }
+  return v.sections;
+}
+
+function splitSection(vid,secId,afterSlideIdx){
+  const v=state.curPlan.variants.find(x=>x.id===vid);if(!v)return;
+  const secs=ensureSections(v);
+  const si=secs.findIndex(s=>s.id===secId);if(si<0)return;
+  const sec=secs[si];
+  if(afterSlideIdx<sec.startIdx||afterSlideIdx>=sec.endIdx)return; // can't split at edges
+  pushUndo();
+  const oldEnd=sec.endIdx;
+  sec.endIdx=afterSlideIdx;
+  secs.splice(si+1,0,mkSection('Section '+(secs.length+1),afterSlideIdx+1,oldEnd));
+  render();
+}
+
+function mergeSections(vid,secId){
+  const v=state.curPlan.variants.find(x=>x.id===vid);if(!v)return;
+  const secs=ensureSections(v);
+  if(secs.length<=1)return; // can't merge the only section
+  const si=secs.findIndex(s=>s.id===secId);if(si<0)return;
+  pushUndo();
+  if(si<secs.length-1){
+    // Merge with next
+    secs[si].endIdx=secs[si+1].endIdx;
+    secs.splice(si+1,1);
+  }else{
+    // Last section: merge with previous
+    secs[si-1].endIdx=secs[si].endIdx;
+    secs.splice(si,1);
+  }
+  if(state.selSecId===secId)state.selSecId=null;
+  render();
+}
+
+function removeSectionBreak(vid,secId){mergeSections(vid,secId)}
+
+function addSectionBreak(vid,afterSlideIdx){
+  const v=state.curPlan.variants.find(x=>x.id===vid);if(!v)return;
+  const secs=ensureSections(v);
+  // Find which section contains this slide
+  for(let i=0;i<secs.length;i++){
+    if(afterSlideIdx>=secs[i].startIdx&&afterSlideIdx<secs[i].endIdx){
+      splitSection(vid,secs[i].id,afterSlideIdx);
+      return;
+    }
+  }
+}
+
+function setSectionDuration(vid,secId,newDur){
+  const v=state.curPlan.variants.find(x=>x.id===vid);if(!v)return;
+  const secs=ensureSections(v);
+  const sec=secs.find(s=>s.id===secId);if(!sec)return;
+  const slideCount=sec.endIdx-sec.startIdx+1;
+  if(slideCount<=0)return;
+  const minDur=STEP*slideCount; // minimum 15s per slide
+  newDur=round(clamp(newDur,minDur,v.totalDuration));
+  // Current section total
+  let curTotal=0;
+  for(let i=sec.startIdx;i<=sec.endIdx;i++)curTotal+=v.slides[i].duration;
+  const diff=newDur-curTotal;if(diff===0)return;
+  pushUndo();
+  // Distribute equally within section (min STEP per slide)
+  const perSlide=Math.max(STEP,round(Math.floor(newDur/slideCount)));
+  const remainder=newDur-perSlide*slideCount;
+  for(let i=sec.startIdx;i<=sec.endIdx;i++){
+    v.slides[i].duration=Math.max(STEP,perSlide+(i===sec.endIdx?remainder:0));
+  }
+  // Give/take the diff from adjacent section
+  const secIdx=secs.indexOf(sec);
+  const adjIdx=secIdx<secs.length-1?secIdx+1:(secIdx>0?secIdx-1:-1);
+  if(adjIdx>=0){
+    const adjSec=secs[adjIdx];
+    const adjCount=adjSec.endIdx-adjSec.startIdx+1;
+    if(diff>0){
+      // Take time from adjacent section
+      let rem=diff;
+      for(let i=adjSec.startIdx;i<=adjSec.endIdx&&rem>0;i++){
+        const take=Math.min(v.slides[i].duration,rem);
+        v.slides[i].duration-=take;rem-=take;
+      }
+    }else{
+      // Give time to adjacent section equally
+      const give=Math.abs(diff);
+      const perAdj=round(Math.floor(give/adjCount));
+      const remAdj=give-perAdj*adjCount;
+      for(let i=adjSec.startIdx;i<=adjSec.endIdx;i++){
+        v.slides[i].duration+=perAdj+(i===adjSec.endIdx?remAdj:0);
+      }
+    }
+  }
+  render();
+}
+
+function renameSec(vid,secId,name){
+  const v=state.curPlan.variants.find(x=>x.id===vid);if(!v)return;
+  const sec=ensureSections(v).find(s=>s.id===secId);
+  if(sec)sec.name=name.slice(0,20);
+}
+
+// Fix section indices after slide add/remove/reorder
+function fixSectionIndices(v){
+  const secs=getSections(v);if(!secs.length)return;
+  const total=v.slides.length;
+  // Ensure sections cover all slides and indices are valid
+  secs.forEach(s=>{s.startIdx=clamp(s.startIdx,0,total-1);s.endIdx=clamp(s.endIdx,s.startIdx,total-1)});
+  // Make contiguous
+  for(let i=1;i<secs.length;i++){secs[i].startIdx=secs[i-1].endIdx+1}
+  if(secs.length)secs[secs.length-1].endIdx=total-1;
+  // Remove empty sections
+  for(let i=secs.length-1;i>=0;i--){if(secs[i].startIdx>secs[i].endIdx)secs.splice(i,1)}
+}
+
+// ─── PPTX Parser (titles + sections, no thumbnails) ───
 async function parsePptx(file){
   if(typeof JSZip==='undefined'){alert('JSZip not loaded. Check internet connection.');return null}
   try{
@@ -218,11 +365,27 @@ async function parsePptx(file){
       if(!title){const ft=xml.match(/<a:t>([^<]+)<\/a:t>/);if(ft)title=ft[1].trim().slice(0,30)}
       titles.push(title.slice(0,MAX_LABEL));
     }
-    return{slideCount,titles,thumbs:new Array(slideCount).fill(null)};
+    // Extract sections from presentation.xml
+    const sections=[];
+    const presFile=zip.file('ppt/presentation.xml');
+    if(presFile){
+      const presXml=await presFile.async('text');
+      const secMatches=[...presXml.matchAll(/<p14:section[^>]*name="([^"]*)"[^>]*>[\s\S]*?<\/p14:section>/gi)];
+      if(secMatches.length){
+        secMatches.forEach(m=>{
+          const name=m[1]||'Section';
+          const slideIds=[...m[0].matchAll(/<p14:sldId[^>]*id="([^"]*)"[^>]*/gi)];
+          if(slideIds.length){
+            sections.push({name:name.slice(0,20),slideCount:slideIds.length});
+          }
+        });
+      }
+    }
+    return{slideCount,titles,thumbs:new Array(slideCount).fill(null),sections};
   }catch(e){console.error('PPTX parse error:',e);alert('Could not parse this PPTX file.');return null}
 }
 
-// ─── PDF Parser (renders real slide thumbnails) ───
+// ─── PDF Parser (renders real slide thumbnails + extracts titles) ───
 async function parsePdf(file){
   const pdfjsLib=window._pdfjs;
   if(!pdfjsLib){alert('PDF renderer not loaded yet. Please wait a moment and try again.');return null}
@@ -231,11 +394,12 @@ async function parsePdf(file){
     const pdf=await pdfjsLib.getDocument({data:buf}).promise;
     const slideCount=pdf.numPages;
     if(!slideCount){alert('No pages found in this PDF.');return null}
-    const thumbs=[];
+    const thumbs=[];const titles=[];
     const TW=320;
     for(let i=1;i<=slideCount;i++){
       try{
         const page=await pdf.getPage(i);
+        // Render thumbnail
         const vp=page.getViewport({scale:1});
         const scale=TW/vp.width;
         const svp=page.getViewport({scale});
@@ -243,9 +407,15 @@ async function parsePdf(file){
         canvas.width=svp.width;canvas.height=svp.height;
         await page.render({canvasContext:canvas.getContext('2d'),viewport:svp}).promise;
         thumbs.push(canvas.toDataURL('image/jpeg',0.7));
-      }catch(e){console.warn('Could not render page',i,e);thumbs.push(null)}
+        // Extract title (first text line, usually the slide title)
+        try{
+          const tc=await page.getTextContent();
+          const firstLine=tc.items.filter(it=>it.str.trim()).slice(0,3).map(it=>it.str.trim()).join(' ');
+          titles.push(firstLine.slice(0,MAX_LABEL));
+        }catch(e){titles.push('')}
+      }catch(e){console.warn('Could not render page',i,e);thumbs.push(null);titles.push('')}
     }
-    return{slideCount,titles:new Array(slideCount).fill(''),thumbs};
+    return{slideCount,titles,thumbs};
   }catch(e){console.error('PDF parse error:',e);alert('Could not parse this PDF.');return null}
 }
 
@@ -286,9 +456,33 @@ function openFile(){
 }
 
 function exportTiming(name,v){
+  const secs=getSections(v);
   let c=0;const ln=[`Plan: ${name} — Variant: ${v.name}`,`Total Duration: ${fmt(v.totalDuration)}`,''];
+  if(secs.length>1){
+    ln.push('--- Sections ---');
+    secs.forEach(sec=>{
+      let secEnd=0;for(let i=0;i<=sec.endIdx;i++)secEnd+=v.slides[i].duration;
+      ln.push(`${sec.name}: ${fmt(secEnd)}`);
+    });
+    ln.push('');
+  }
+  ln.push('--- Slides ---');
   v.slides.forEach((s,i)=>{c+=s.duration;ln.push(`Slide ${String(i+1).padStart(2,' ')}${s.label?' - '+s.label:''}: ${fmt(c)}`)});
-  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([ln.join('\n')],{type:'text/plain'}));a.download=`${name}-${v.name}.txt`;a.click();
+  const txt=ln.join('\n');
+  const ov=el('div','overlay');
+  ov.onclick=e=>{if(e.target===ov)ov.remove()};
+  ov.innerHTML=`<div class="modal" style="min-width:480px;max-width:600px">
+    <h3 style="font-size:20px;font-weight:800;margin:0 0 4px">Timing Sheet</h3>
+    <p style="font-size:13px;color:var(--td);margin:0 0 16px">Copy the timing breakdown below</p>
+    <textarea id="export-txt" readonly style="width:100%;height:320px;font-family:var(--m);font-size:13px;padding:12px;border:1.5px solid var(--bd);border-radius:10px;background:var(--sa);color:var(--tx);resize:vertical;line-height:1.6">${esc(txt)}</textarea>
+    <div class="flex gap-8 justify-e" style="margin-top:16px">
+      <button class="bs" onclick="this.closest('.overlay').remove()">Close</button>
+      <button class="bp" onclick="navigator.clipboard.writeText(document.getElementById('export-txt').value);this.textContent='Copied!';setTimeout(()=>this.textContent='Copy to Clipboard',1500)">Copy to Clipboard</button>
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
+  // Auto-select all text
+  setTimeout(()=>{const ta=$('#export-txt');if(ta){ta.focus();ta.select()}},100);
 }
 
 // ─── Undo/Redo ───
@@ -315,9 +509,9 @@ function getAV(){return state.curPlan?.variants.find(v=>v.id===state.actVId)||st
 function setDur(vid,sid,nd){
   const v=state.curPlan.variants.find(x=>x.id===vid);if(!v)return;
   const sl=[...v.slides];const i=sl.findIndex(x=>x.id===sid);if(i<0)return;
-  nd=round(clamp(nd,0,v.totalDuration));const d=nd-sl[i].duration;if(!d)return;
+  nd=round(clamp(nd,STEP,v.totalDuration));const d=nd-sl[i].duration;if(!d)return;
   pushUndo();sl[i]={...sl[i],duration:nd};
-  if(d>0){let r=d;for(let j=i+1;j<sl.length&&r>0;j++){const tk=Math.min(sl[j].duration,r);sl[j]={...sl[j],duration:sl[j].duration-tk};r-=tk}if(r>0)sl[i]={...sl[i],duration:nd-r}}
+  if(d>0){let r=d;for(let j=i+1;j<sl.length&&r>0;j++){const tk=Math.min(Math.max(sl[j].duration-STEP,0),r);sl[j]={...sl[j],duration:sl[j].duration-tk};r-=tk}if(r>0)sl[i]={...sl[i],duration:nd-r}}
   else{for(let j=i+1;j<sl.length;j++){sl[j]={...sl[j],duration:sl[j].duration+(-d)};break}}
   v.slides=sl;render();
 }
@@ -325,26 +519,33 @@ function setDur(vid,sid,nd){
 function addSlideAfter(vid,ai){
   const v=state.curPlan.variants.find(x=>x.id===vid);if(!v||v.slides.length>=MAX_SLIDES)return;
   pushUndo();const sl=[...v.slides];const p=sl[ai];const tk=p?round(Math.floor(p.duration/2)):STEP;
-  if(p)sl[ai]={...p,duration:p.duration-tk};sl.splice(ai+1,0,mkSlide(tk));v.slides=sl;render();
+  if(p)sl[ai]={...p,duration:p.duration-tk};sl.splice(ai+1,0,mkSlide(tk));v.slides=sl;
+  // Adjust section indices
+  const secs=getSections(v);secs.forEach(s=>{if(s.endIdx>=ai+1)s.endIdx++;if(s.startIdx>ai)s.startIdx++});
+  fixSectionIndices(v);render();
 }
 
 function addSlideEnd(vid){
   const v=state.curPlan.variants.find(x=>x.id===vid);if(!v||v.slides.length>=MAX_SLIDES)return;
   pushUndo();const sl=[...v.slides];const l=sl[sl.length-1];const tk=l?round(Math.floor(l.duration/2)):STEP;
-  if(l)sl[sl.length-1]={...l,duration:l.duration-tk};sl.push(mkSlide(tk));v.slides=sl;render();
+  if(l)sl[sl.length-1]={...l,duration:l.duration-tk};sl.push(mkSlide(tk));v.slides=sl;
+  const secs=getSections(v);if(secs.length)secs[secs.length-1].endIdx=v.slides.length-1;
+  render();
 }
 
 function rmSlide(vid,sid){
   const v=state.curPlan.variants.find(x=>x.id===vid);if(!v||v.slides.length<=1)return;
   pushUndo();const sl=[...v.slides];const i=sl.findIndex(x=>x.id===sid);if(i<0)return;
   const rm=sl[i];sl.splice(i,1);const t=i>0?i-1:0;sl[t]={...sl[t],duration:sl[t].duration+rm.duration};
-  v.slides=sl;if(state.selId===sid)state.selId=null;render();
+  v.slides=sl;if(state.selId===sid)state.selId=null;
+  fixSectionIndices(v);render();
 }
 
 function reorderSlide(vid,fromId,toId){
   if(!fromId||fromId===toId)return;const v=state.curPlan.variants.find(x=>x.id===vid);if(!v)return;
   pushUndo();const sl=[...v.slides];const fi=sl.findIndex(x=>x.id===fromId);const ti=sl.findIndex(x=>x.id===toId);
-  if(fi<0||ti<0)return;const[mv]=sl.splice(fi,1);sl.splice(ti,0,mv);v.slides=sl;state.dragId=null;render();
+  if(fi<0||ti<0)return;const[mv]=sl.splice(fi,1);sl.splice(ti,0,mv);v.slides=sl;state.dragId=null;
+  fixSectionIndices(v);render();
 }
 
 // ─── Variant ops ───
@@ -380,9 +581,19 @@ function renderHome(app){
   const plans=state.plans;
   let h=`<div class="page"><div class="col">
     <div class="text-c"><div class="hero-icon">⏱</div><h1 class="hero-t">PrezTimingTool</h1><p class="hero-s">Nail your presentation pace, every time</p></div>
-    <div class="flex items-c justify-c gap-8">
-      <button class="bp" onclick="goCreate()" data-tip="Create a new timing plan">${ic('plus')} New Plan</button>
-      <button class="bs" onclick="doImport()" data-tip="Import a previously saved .json plan">${ic('file',16)} Import</button>
+    <div class="home-actions">
+      <div class="home-act" onclick="goCreate()" data-tip="Create a new plan from scratch">
+        <div class="ha-icon">✏️</div><div class="ha-label">New Plan</div><div class="ha-sub">Start from scratch</div>
+      </div>
+      <div class="home-act" onclick="pickFile('.pdf')" data-tip="Import a PDF for slide count + visual thumbnails">
+        <div class="ha-icon">📄</div><div class="ha-label">Import PDF</div><div class="ha-sub">With thumbnails</div>
+      </div>
+      <div class="home-act" onclick="pickFile('.pptx')" data-tip="Import a PPTX for slide count, titles and sections">
+        <div class="ha-icon">📊</div><div class="ha-label">Import PPTX</div><div class="ha-sub">Titles + sections</div>
+      </div>
+      <div class="home-act" onclick="doImport()" data-tip="Load a previously saved .json plan">
+        <div class="ha-icon">📂</div><div class="ha-label">Load Plan</div><div class="ha-sub">From .json file</div>
+      </div>
     </div>`;
   if(plans.length){
     h+=`<div class="mt-20"><div class="sec-l">Your Plans</div><div class="flex flex-col gap-8">`;
@@ -396,6 +607,7 @@ function renderHome(app){
     });
     h+=`</div></div>`;
   }
+  h+=`<div style="text-align:center;margin-top:24px;font-size:12px;color:var(--td)">© 2026 <a href="https://www.linkedin.com/in/sylvainhauser/" target="_blank" style="color:var(--ac);text-decoration:none;font-weight:600"><svg width="14" height="14" viewBox="0 0 24 24" fill="var(--ac)" style="vertical-align:-2px;margin-right:3px"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>Sylvain Hauser</a></div>`;
   h+=`</div></div>`;
   app.innerHTML=h;
 }
@@ -465,13 +677,13 @@ function renderEditor(app){
 
   let h=`<div class="ed-page">
     <div class="top-bar">
-      <button class="bk" onclick="goHome()" data-tip="Back to all plans">${ic('chevL')} Plans</button>
+      <button class="bk" onclick="goHome()" data-tip="Back to all plans" style="font-size:15px">${ic('chevL',18)} Plans</button>
       <input class="top-nm" value="${esc(p.name)}" maxlength="60" oninput="state.curPlan.name=this.value" title="Plan name — click to edit">
-      <div class="flex items-c gap-6">
-        <button class="bt" onclick="undo()" ${state.hist.length?'':'disabled'} data-tip="Undo last change">${ic('undo')}</button>
-        <button class="bt" onclick="redo()" ${state.fut.length?'':'disabled'} data-tip="Redo">${ic('redo')}</button>
-        <div style="width:1px;height:20px;background:var(--bd);margin:0 4px"></div>
-        <button class="bt" onclick="doSave()" data-tip="Save plan to file">${ic('save')}</button>
+      <div class="flex items-c gap-8">
+        <button class="bt" onclick="undo()" ${state.hist.length?'':'disabled'} data-tip="Undo last change">${ic('undo')} <span class="bt-label">Undo</span></button>
+        <button class="bt" onclick="redo()" ${state.fut.length?'':'disabled'} data-tip="Redo">${ic('redo')} <span class="bt-label">Redo</span></button>
+        <div style="width:1px;height:24px;background:var(--bd);margin:0 4px"></div>
+        <button class="bt" onclick="doSave()" data-tip="Save plan to file">${ic('save')} <span class="bt-label">Save</span></button>
       </div>
     </div>
     <div class="var-area">`;
@@ -490,23 +702,28 @@ function renderEditor(app){
     }
     h+=`<span class="flex-1"></span>`;
     if(isAct){
-      h+=`<button class="bi" onclick="event.stopPropagation();openDurModal()" data-tip="Adjust total duration">${ic('gear')}</button>`;
-      h+=`<button class="bi" onclick="event.stopPropagation();addSlideEnd('${v.id}')" ${v.slides.length>=MAX_SLIDES?'disabled':''} data-tip="Add slide at end">${ic('plus',15)}</button>`;
-      h+=`<button class="bi" onclick="event.stopPropagation();doExport('${v.id}')" data-tip="Export timing as text file">${ic('down')}</button>`;
+      h+=`<button class="bd" onclick="event.stopPropagation();openDurModal()" data-tip="Adjust total duration">${ic('gear',14)} Duration</button>`;
+      h+=`<button class="bd" onclick="event.stopPropagation();addSlideEnd('${v.id}')" ${v.slides.length>=MAX_SLIDES?'disabled':''} data-tip="Add slide at end">${ic('plus',14)} Slide</button>`;
+      h+=`<button class="bd" onclick="event.stopPropagation();doExport('${v.id}')" data-tip="View timing summary">${ic('down',14)} Summary</button>`;
     }
-    h+=`<button class="bi" onclick="event.stopPropagation();cloneVariant('${v.id}')" data-tip="Clone this variant">${ic('copy',15)}</button>`;
-    h+=`<button class="bi" onclick="event.stopPropagation();toggleHide('${v.id}')" style="color:${hideConfirm===v.id?'var(--coral)':'var(--td)'}" data-tip="${hideConfirm===v.id?'Click again to confirm':'Hide this variant'}">${hideConfirm===v.id?'<span style="font-size:11px;font-weight:700">Hide?</span>':ic('eyeOff')}</button>`;
+    h+=`<button class="bd" onclick="event.stopPropagation();cloneVariant('${v.id}')" data-tip="Clone this variant">${ic('copy',14)} Clone</button>`;
+    h+=`<button class="bd" onclick="event.stopPropagation();toggleHide('${v.id}')" style="color:${hideConfirm===v.id?'var(--coral)':'var(--td)'}" data-tip="${hideConfirm===v.id?'Click again to confirm':'Hide this variant'}">${hideConfirm===v.id?'<span style="font-weight:700">Hide?</span>':ic('eyeOff',14)+' Hide'}</button>`;
     h+=`</div>`;
 
-    // Timeline
-    h+=renderTimeline(v,isAct,dm);
+    // Timeline + Sections (unified scroll container)
+    h+=renderTimelineWithSections(v,isAct,dm);
 
-    // Detail panel under active variant
+    // Section detail panel
+    if(isAct&&state.selSecId&&!state.selId){
+      h+=renderSecDetail(v);
+    }
+
+    // Slide detail panel under active variant
     if(isAct&&state.selId){
       const si=v.slides.findIndex(s=>s.id===state.selId);
       const ss=v.slides[si];
       if(ss){
-        h+=`<div class="det-bar">
+        h+=`<div class="det-bar" onclick="event.stopPropagation()">
           <div class="flex items-c gap-8" style="min-width:160px">
             <div class="sl-big">${si+1}</div>
             <div>
@@ -517,7 +734,7 @@ function renderEditor(app){
           <div class="flex-1 flex flex-col" style="gap:4px">
             <div class="flex items-c gap-8">
               <span class="fl" style="margin:0;min-width:58px">Duration</span>
-              <input type="range" min="0" max="${v.totalDuration}" step="${STEP}" value="${ss.duration}" oninput="setDur('${v.id}','${ss.id}',parseInt(this.value));render()" title="Drag to adjust duration" style="flex:1;accent-color:var(--ac);height:6px">
+              <input type="range" min="${STEP}" max="${v.totalDuration}" step="${STEP}" value="${ss.duration}" oninput="setDur('${v.id}','${ss.id}',parseInt(this.value));render()" title="Drag to adjust duration" style="flex:1;accent-color:var(--ac);height:6px">
               <input class="fi fi-sm fi-mono" value="${fmt(ss.duration)}" style="width:72px" onblur="commitDur('${v.id}','${ss.id}',this.value)" onkeydown="if(event.key==='Enter')commitDur('${v.id}','${ss.id}',this.value)" title="Type duration as mm:ss">
             </div>
             ${ss.duration===0?'<div style="font-size:12px;color:var(--gold);font-weight:600">⚠ Hidden (0 duration)</div>':''}
@@ -545,53 +762,145 @@ function renderEditor(app){
   app.innerHTML=h;
 }
 
-function renderTimeline(v,isAct,dm){
+function renderTimelineWithSections(v,isAct,dm){
   const sl=v.slides,tot=v.totalDuration;
   let cum=0;const pos=sl.map(s=>{const st=cum;cum+=s.duration;return{st,end:cum,pct:tot>0?(s.duration/tot)*100:0}});
   const ms=tot<=120?30:tot<=300?60:tot<=900?120:300;
-  let h=`<div class="tl-out"><div class="tl-mk">`;
+  const secs=ensureSections(v);
+  const N=sl.length;
+  
+  // CSS Grid: 2*N-1 columns. Odd columns = slides (fr units by duration). Even columns = dividers (18px).
+  // Row 1: time markers (spans all)
+  // Row 2: slides + dividers
+  // Row 3: sections (span multiple columns)
+  const colDefs=[];
+  sl.forEach((s,i)=>{
+    colDefs.push(`minmax(60px,${s.duration||1}fr)`);
+    if(i<N-1)colDefs.push('18px');
+  });
+  
+  let h=`<div class="tl-out"><div class="tl-grid" style="display:grid;grid-template-columns:${colDefs.join(' ')};grid-template-rows:auto auto auto;gap:0" data-vid="${v.id}">`;
+  
+  // Row 1: Time markers (span all columns)
+  h+=`<div class="tl-mk" style="grid-column:1/-1;grid-row:1">`;
   for(let t=0;t<=tot;t+=ms){
     h+=`<div style="position:absolute;left:${(t/tot)*100}%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center"><div style="width:1px;height:6px;background:var(--bd)"></div><span class="tl-mk-l">${fmt(t)}</span></div>`;
   }
-  h+=`</div><div class="tl-tk" data-vid="${v.id}">`;
+  h+=`</div>`;
+  
+  // Row 2: Slides and dividers
   sl.forEach((s,i)=>{
+    const col=i*2+1; // 1-based grid column
     const z=s.duration===0;const sel=s.id===state.selId&&isAct;
     const dk=v.id+'-'+i;const diff=dm.get(dk);
-    let bg='';if(diff==='more')bg='background:var(--diff-more);';if(diff==='less')bg='background:var(--diff-less);';
+    let bg='';if(diff==='more')bg='background:rgba(76,175,80,0.12);';if(diff==='less')bg='background:rgba(239,100,97,0.10);';
     if(sel)bg='background:var(--ab);';
-    const w=z?'width:8px':'width:max(60px,calc('+pos[i].pct+'vw * 0.82))';
-    h+=`<div class="flex items-c shrink-0" style="align-items:stretch">`;
-    h+=`<div class="sl ${sel?'sel':''} ${z?'zero':''}" style="${w};${bg}" draggable="true"
+    h+=`<div class="sl ${sel?'sel':''} ${z?'zero':''}" style="grid-column:${col};grid-row:2;${bg}" draggable="true"
       data-sid="${s.id}" data-vid="${v.id}"
-      onclick="event.stopPropagation();state.actVId='${v.id}';state.selId='${s.id}';render()"
-      ondragstart="state.dragId='${s.id}'" ondragover="event.preventDefault()" ondrop="reorderSlide('${v.id}','${state.dragId}','${s.id}')"
-      data-tip="Slide ${i+1}${s.label?' — '+s.label:''} · ${fmtD(s.duration)} · ends ${fmt(pos[i].end)}">`;
+      onclick="event.stopPropagation();state.actVId='${v.id}';state.selId='${s.id}';state.selSecId=null;render()"
+      ondragstart="state.dragId='${s.id}'" ondragover="event.preventDefault()" ondrop="reorderSlide('${v.id}',state.dragId,'${s.id}')"
+      data-tip="Slide ${i+1}${s.label?' \u2014 '+s.label:''} \u00b7 ${fmtD(s.duration)} \u00b7 ends ${fmt(pos[i].end)}">`;
     if(!z){
       h+=`<div class="sl-grip">${ic('grip')}</div>`;
       h+=`<div class="sl-n">${i+1}</div>`;
       if(s.thumb)h+=`<img class="sl-thumb" src="${s.thumb}" alt="Slide ${i+1}" draggable="false">`;
-      h+=`<div class="sl-l">${s.label||'<span style="opacity:.25">—</span>'}</div>`;
+      h+=`<div class="sl-l">${s.label||'<span style="opacity:.25">\u2014</span>'}</div>`;
       h+=`<div class="sl-d">${fmtD(s.duration)}</div>`;
       h+=`<div class="sl-c">${fmt(pos[i].end)}</div>`;
     }else{
       h+=`<div style="writing-mode:vertical-rl;font-size:9px;color:var(--td);font-weight:700">${i+1}</div>`;
     }
     h+=`</div>`;
-    if(i<sl.length-1){
-      h+=`<div class="div-h" data-div="${i}" data-vid="${v.id}" data-tip="Drag to redistribute time" onmousedown="startDivDrag(event,'${v.id}',${i})"><div class="div-l"></div></div>`;
+    // Divider
+    if(i<N-1){
+      const divCol=i*2+2;
+      const isBreak=secs.some(sec=>sec.endIdx===i);
+      h+=`<div class="div-h" style="grid-column:${divCol};grid-row:2" data-div="${i}" data-vid="${v.id}" onmousedown="startDivDrag(event,'${v.id}',${i})" data-tip="Drag to redistribute time">
+        <div class="div-l ${isBreak?'dragging':''}"></div>
+      </div>`;
     }
-    h+=`</div>`;
   });
+  
+  // Row 3: Sections (span from startIdx column to endIdx column inclusive, accounting for dividers)
+  if(secs.length){
+    secs.forEach((sec,si)=>{
+      let secDur=0;
+      for(let i=sec.startIdx;i<=sec.endIdx;i++)secDur+=sl[i]?.duration||0;
+      const isSel=state.selSecId===sec.id;
+      const slideCount=sec.endIdx-sec.startIdx+1;
+      const startCol=sec.startIdx*2+1;
+      const endCol=sec.endIdx*2+1;
+      // Section spans from startCol to endCol (inclusive), which in grid is startCol / endCol+1
+      h+=`<div class="sec-block sec-colors-${si%8} ${isSel?'sel':''}" 
+        style="grid-column:${startCol}/${endCol+1};grid-row:3;margin-top:8px;border-radius:10px${isAct?'':';opacity:0.7;cursor:default'}"
+        ${isAct?`onclick="event.stopPropagation();state.selSecId='${sec.id}';state.selId=null;render()"`:''} 
+        data-tip="${esc(sec.name)} · ${slideCount} slide${slideCount!==1?'s':''} · ${fmtD(secDur)}">
+        <span class="sec-name">${esc(sec.name)}</span>
+        <span class="sec-time">${fmtD(secDur)}</span>
+        <span class="sec-slides">(${slideCount})</span>
+      </div>`;
+      // Merge button in the divider column between sections (active variant only)
+      if(isAct&&si<secs.length-1){
+        const mergeCol=sec.endIdx*2+2;
+        h+=`<div class="sec-split" style="grid-column:${mergeCol};grid-row:3;margin-top:8px" data-tip="Merge sections" onclick="event.stopPropagation();mergeSections('${v.id}','${secs[si+1].id}')">
+          <div class="sec-split-btn">\u21d4</div>
+        </div>`;
+      }
+    });
+  }
+  
   h+=`</div></div>`;
   return h;
 }
+
+function renderSecDetail(v){
+  if(!state.selSecId)return '';
+  const secs=ensureSections(v);
+  const sec=secs.find(s=>s.id===state.selSecId);
+  if(!sec)return '';
+  let secDur=0;
+  for(let i=sec.startIdx;i<=sec.endIdx;i++)secDur+=v.slides[i]?.duration||0;
+  const slideCount=sec.endIdx-sec.startIdx+1;
+  const canSplit=slideCount>1;
+  const canMerge=secs.length>1;
+  let h=`<div class="sec-det" onclick="event.stopPropagation()">
+    <div style="min-width:140px">
+      <label class="fl" style="margin-bottom:2px;display:block">Section name</label>
+      <input class="fi fi-sm" value="${esc(sec.name)}" maxlength="20" oninput="renameSec('${v.id}','${sec.id}',this.value)" style="width:140px" title="Section name">
+    </div>
+    <div style="font-size:13px;color:var(--td);font-weight:500">Slides ${sec.startIdx+1}–${sec.endIdx+1} (${slideCount})</div>
+    <div class="flex-1 flex items-c gap-8">
+      <span class="fl" style="margin:0;min-width:58px">Duration</span>
+      <input type="range" min="0" max="${v.totalDuration}" step="${STEP}" value="${secDur}" 
+        oninput="setSectionDuration('${v.id}','${sec.id}',parseInt(this.value))" 
+        title="Adjust section duration" style="flex:1;accent-color:var(--ac);height:8px">
+      <input class="fi fi-sm fi-mono" id="sec-dur-input" value="${fmt(secDur)}" style="width:78px" onclick="event.stopPropagation();this.select()"
+        onblur="commitSecDur('${v.id}','${sec.id}',this.value)" 
+        onkeydown="if(event.key==='Enter'){this.blur()}" 
+        title="Type section duration as mm:ss">
+    </div>`;
+  if(canSplit){
+    h+=`<div class="flex items-c gap-6" style="border-left:1px solid var(--bd);padding-left:14px">
+      <span class="fl" style="margin:0">Split after</span>`;
+    for(let i=sec.startIdx;i<sec.endIdx;i++){
+      h+=`<button class="bd" onclick="splitSection('${v.id}','${sec.id}',${i})" data-tip="Split after slide ${i+1}" style="padding:5px 8px;font-size:12px">${i+1}</button>`;
+    }
+    h+=`</div>`;
+  }
+  if(canMerge){
+    h+=`<button class="bd" style="color:var(--coral)" onclick="mergeSections('${v.id}','${sec.id}')" data-tip="Merge with adjacent section">${ic('trash',14)} Merge</button>`;
+  }
+  h+=`</div>`;
+  return h;
+}
+
 
 // ─── Divider drag ───
 let divState=null;
 function startDivDrag(e,vid,idx){
   e.preventDefault();e.stopPropagation();
   const v=state.curPlan.variants.find(x=>x.id===vid);if(!v)return;
-  const track=e.target.closest('.tl-tk');if(!track)return;
+  const track=e.target.closest('.tl-grid');if(!track)return;
   divState={vid,idx,startX:e.clientX,startDurs:v.slides.map(s=>s.duration),track,tot:v.totalDuration};
   document.body.style.cursor='col-resize';
   document.addEventListener('mousemove',onDivMove);
@@ -603,7 +912,7 @@ function onDivMove(e){
   const tw=track.scrollWidth;const pps=tw/tot;
   const dx=e.clientX-startX;const ds=round(dx/pps);
   const oL=startDurs[idx],oR=startDurs[idx+1];
-  const nL=clamp(oL+ds,0,oL+oR);
+  const nL=clamp(oL+ds,STEP,oL+oR-STEP);
   // Visual preview via direct DOM (fast, no re-render)
   const blocks=track.querySelectorAll('.sl');
   if(blocks[idx])blocks[idx].querySelector('.sl-d').textContent=fmtD(nL);
@@ -620,7 +929,7 @@ function onDivUp(e){
   divState=null;
   if(ds===0){render();return}
   const oL=startDurs[idx],oR=startDurs[idx+1];
-  const nL=clamp(oL+ds,0,oL+oR);
+  const nL=clamp(oL+ds,STEP,oL+oR-STEP);
   const v=state.curPlan.variants.find(x=>x.id===vid);
   if(!v)return;
   pushUndo();
@@ -648,7 +957,12 @@ window.handleImportFile=async(file)=>{
   if(data){
     window._importData=data;
     window._ns=data.slideCount;
-    if(!window._nn)window._nn=file.name.replace(/\.(pptx|pdf)$/i,'');
+    window._nn=file.name.replace(/\.(pptx|pdf)$/i,'');
+    if(state.screen==='home'){
+      // Go directly to create screen with data pre-filled
+      window._nm=15;window._nc=0;
+      state.screen='create';
+    }
     renderCreate($('#app'));
   }
 };
@@ -664,8 +978,18 @@ window.doCreate=()=>{
     const thumb=id&&id.thumbs[i]?id.thumbs[i]:null;
     slides.push(mkSlide(dur,label,thumb));
   }
-  const plan={id:uid(),name:window._nn||'Untitled',createdAt:Date.now(),variants:[{id:uid(),name:'Default',slides,totalDuration:tot,hidden:false}]};
-  state.plans.push(plan);state.curPlan=plan;state.actVId=plan.variants[0].id;state.selId=null;state.hist=[];state.fut=[];state.fileHandle=null;state.screen='editor';window._importData=null;render();
+  // Build sections from import
+  let sections=[];
+  if(id&&id.sections&&id.sections.length>1){
+    let idx=0;
+    id.sections.forEach(s=>{
+      const end=Math.min(idx+s.slideCount-1,slideCount-1);
+      if(idx<=end)sections.push(mkSection(s.name,idx,end));
+      idx=end+1;
+    });
+  }
+  const plan={id:uid(),name:window._nn||'Untitled',createdAt:Date.now(),variants:[{id:uid(),name:'Default',slides,totalDuration:tot,hidden:false,sections}]};
+  state.plans.push(plan);state.curPlan=plan;state.actVId=plan.variants[0].id;state.selId=null;state.selSecId=null;state.hist=[];state.fut=[];state.fileHandle=null;state.screen='editor';window._importData=null;render();
 };
 window.loadPlan=id=>{
   const p=state.plans.find(x=>x.id===id);if(!p)return;
@@ -727,6 +1051,17 @@ window.undo=undo;window.redo=redo;
 window.setDur=setDur;window.addSlideAfter=addSlideAfter;window.addSlideEnd=addSlideEnd;window.rmSlide=rmSlide;
 window.reorderSlide=reorderSlide;window.cloneVariant=cloneVariant;window.toggleHide=toggleHide;
 window.startDivDrag=startDivDrag;window.state=state;
+window.addSectionBreak=addSectionBreak;window.removeSectionBreak=removeSectionBreak;
+window.setSectionDuration=setSectionDuration;window.renameSec=renameSec;
+window.splitSection=splitSection;window.mergeSections=mergeSections;
+window.round=round;window.parseT=parseT;
+window.commitSecDur=(vid,secId,val)=>{setSectionDuration(vid,secId,round(parseT(val)))};
+window.removeSectionBreakAt=(vid,slideIdx)=>{
+  const v=state.curPlan.variants.find(x=>x.id===vid);if(!v)return;
+  const secs=getSections(v);
+  const sec=secs.find(s=>s.endIdx===slideIdx);
+  if(sec)mergeSections(vid,sec.id);
+};
 
 // ─── INIT ───
 initTips();
