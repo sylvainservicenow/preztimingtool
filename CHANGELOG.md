@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 2026-03-01 — v1.6
+- **PDF title extraction** — PDF import now extracts slide titles from text content (first text line per page) in addition to thumbnails
+- **Sections on all variants** — Section bar now visible on inactive variants too (dimmed, non-interactive). Only active variant allows editing
+- **Sections visible everywhere** — No more disappearing sections when switching between variants
+
 ## 2026-03-01 — v1.5
 - **Summary popup** — "Summary" button replaces "Export". Shows timing breakdown in a modal with copy-to-clipboard instead of downloading a text file
 - **CSS Grid timeline** — Slides and sections now share a CSS Grid, guaranteeing pixel-perfect alignment
