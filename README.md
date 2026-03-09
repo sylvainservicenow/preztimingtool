@@ -8,19 +8,20 @@ A free, open-source, single-file web tool that helps presenters allocate and adj
 
 ## ✨ Features
 
-- **Visual timeline** — Horizontal slide blocks sized proportionally to duration
-- **Sections** — Group slides into sections with independent timing control; split and merge sections visually
-- **Drag dividers** — Redistribute time between adjacent slides by dragging
-- **Drag to reorder** — Rearrange slides on the timeline
-- **15-second precision** — All durations snap to 15-second increments
-- **PDF import** — Import a PDF of your presentation with real slide thumbnail previews
-- **PPTX import** — Import PowerPoint files to extract slide count, titles, and sections
-- **Multiple variants** — Clone timing plans to compare different pacing strategies (e.g. 15-min vs 30-min)
-- **Variant diff highlighting** — Visual indicators show where variants differ
-- **Undo/Redo** — Up to 20 levels of undo, global across all actions
-- **Save/Load** — Native Chrome file save dialog, or standard download in other browsers
-- **Export timing sheet** — Generate a text file with cumulative timestamps per slide
-- **Up to 50 slides** per variant, desktop optimized
+- **Visual timeline** — Horizontal slide blocks sized proportionally to duration (CSS Grid)
+- **Sections** — Group slides into sections with independent timing control; split, merge, drag-reorder
+- **PDF import** — Slide thumbnails + titles extracted from text content
+- **PPTX import** — Slide titles + sections (hidden slides auto-detected and skipped)
+- **PDF + PPTX combo** — Import both for thumbnails from PDF + sections/titles from PPTX
+- **Lock slides/sections** — 🔒 Lock durations so they don't change when adjusting others
+- **Slide hover preview** — Large thumbnail popup when hovering slides with images
+- **Multiple variants** — Clone timing plans to compare pacing (e.g. 15-min vs 30-min)
+- **Drag dividers** — Redistribute time between adjacent slides
+- **15-second precision** — All durations snap to 15s increments, 15s minimum
+- **Summary popup** — Copy-to-clipboard timing breakdown with sections
+- **Undo/Redo** — 20 levels, global across all actions
+- **Save/Load** — Native Chrome file dialog, .json format
+- **Desktop optimized** — Designed for wide screens
 
 ## 🚀 Quick Start
 
@@ -34,34 +35,35 @@ Visit **[sylvainservicenow.github.io/preztimingtool](https://sylvainservicenow.g
 
 ## 📂 Import Options
 
-| Format | What it imports | Thumbnails? |
-|--------|----------------|-------------|
-| **PDF** | Slide count + visual previews | ✅ Real slide images |
-| **PPTX** | Slide count + titles + sections | ❌ No thumbnails |
-| **JSON** | Full saved plan with all settings | N/A |
+| Format | What it imports | Thumbnails? | Sections? |
+|--------|----------------|-------------|----------|
+| **PDF** | Slide count + titles + previews | ✅ Real images | ❌ |
+| **PPTX** | Slide count + titles + sections | ❌ | ✅ Auto-imported |
+| **PDF + PPTX** | Best of both | ✅ From PDF | ✅ From PPTX |
+| **JSON** | Full saved plan | N/A | N/A |
 
-> 💡 **Tip**: Export your PowerPoint as PDF first for the best experience — you get both visual thumbnails AND can manually add sections.
+> 💡 Hidden slides in PPTX are automatically detected and skipped to match PDF export.
 
 ## 🛠 Technical Details
 
 - **Single HTML file** — No build step, no bundler, no framework
 - **Vanilla JavaScript** — No React, no Vue, no jQuery
 - **CDN dependencies**: Google Fonts, JSZip (PPTX parsing), PDF.js (thumbnail rendering)
-- **File System Access API** — Native Chrome file save/open with download fallback
-- Works offline after first load
+- **CSS Grid timeline** — Slides and sections share grid columns for pixel-perfect alignment
+- **File System Access API** — Native Chrome file save with download fallback
 
 ## 📋 Documentation
 
 See [DOCS.md](DOCS.md) for full architecture, data model, design decisions, and re-prompting guide.
+See [CHANGELOG.md](CHANGELOG.md) for version history.
 
 ## 🤝 Contributing
 
-Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines. Please keep the single-file architecture.
+Contributions welcome! See [CONTRIBUTING.md](CONTRIBUTING.md). Please keep the single-file architecture.
 
 ## 📄 License
 
-MIT License — see [LICENSE](LICENSE) for details.
+MIT License — see [LICENSE](LICENSE).
 
-## 🙏 Acknowledgments
-
-Built with ❤️ for the presentation community. If this tool helps you nail your timing, give it a ⭐!
+---
+© 2026 [Sylvain Hauser](https://www.linkedin.com/in/sylvainhauser/) — Built with ❤️ for the presentation community
