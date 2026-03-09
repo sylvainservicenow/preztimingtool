@@ -1,28 +1,28 @@
 # CHANGELOG
 
+## 2026-03-09 — v2.1
+- **Combo import screen** — New 5th homepage option "PDF + PPTX" opens a dedicated upload screen for both files. No more browser confirm dialogs.
+- **Lock feedback** — When a slide is locked, the duration controls are replaced with a clear "🔒 This slide is locked — unlock to change duration" message
+- **Merge fix** — The ⇔ merge button now correctly merges the sections on its left and right (was incorrectly merging two sections to the right)
+- **Slide hover preview** — When thumbnails exist, hovering a slide shows a large 360px preview popup with title and duration
+- **Homepage: 5 action cards** — New Plan, Import PDF, Import PPTX, PDF+PPTX, Load Plan
+
 ## 2026-03-01 — v2.0
-- **PDF+PPTX combo import** — When importing PDF, optionally also import PPTX to get sections and titles combined with PDF thumbnails. Validates matching slide counts.
-- **Loading indicator** — Spinner overlay with status message during file imports (PDF rendering, PPTX parsing)
-- **Lock slides** — Lock individual slide durations so they don't change when adjusting other slides. 🔒 icon shown on locked slides.
-- **Lock sections** — Lock entire sections (locks all slides within). Locked sections are skipped during time cascade.
-- **Drag-reorder sections** — Drag and drop section blocks to reorder them. All slides within the section move together.
-- **Lock-aware redistribution** — setDur, setSectionDuration, and divider drag all skip locked slides/sections
+- **PDF+PPTX combo import** — Combined import for thumbnails + sections/titles
+- **Loading indicator** — Spinner overlay during file imports
+- **Lock slides/sections** — 🔒 Lock individual slides or entire sections
+- **Drag-reorder sections** — Drag section blocks to reorder (moves slides with them)
+- **Lock-aware redistribution** — Duration changes skip locked items
 
 ## 2026-03-01 — v1.6
-- **PDF title extraction** — PDF import now extracts slide titles from text content (first text line per page) in addition to thumbnails
-- **Sections on all variants** — Section bar now visible on inactive variants too (dimmed, non-interactive). Only active variant allows editing
+- **PDF title extraction** — Extracts titles via getTextContent()
+- **Sections on all variants** — Visible on inactive variants (dimmed)
 
 ## 2026-03-01 — v1.5
-- **Summary popup** — "Summary" button replaces "Export". Shows timing breakdown in a modal with copy-to-clipboard
-- **CSS Grid timeline** — Slides and sections share a CSS Grid for pixel-perfect alignment
-- **Minimum 15s slides** — Enforced in slider, manual input, divider drag, and section redistribution
-- **LinkedIn footer** — © 2026 Sylvain Hauser with LinkedIn icon link
-- **Toolbar labels** — All buttons have text: Undo, Redo, Save, Duration, Slide, Summary, Clone, Hide
+- **Summary popup** — Copy-to-clipboard timing breakdown
+- **CSS Grid timeline** — Pixel-perfect slide/section alignment
+- **Minimum 15s slides** — Enforced everywhere
+- **Toolbar labels** — All buttons have text labels
 
 ## 2026-02-28 — v1.0
 - Initial release
-- Visual horizontal timeline with proportional slide blocks
-- Drag dividers, sections, variants, undo/redo
-- PDF import (thumbnails), PPTX import (titles + sections)
-- Native Chrome file save, Summary popup
-- 4-action homepage: New Plan, Import PDF, Import PPTX, Load Plan
