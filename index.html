@@ -41,7 +41,7 @@ button:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
 
 /* ── Layout ── */
 .page{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px}
-.col{max-width:560px;width:100%;display:flex;flex-direction:column;gap:20px}
+.col{max-width:720px;width:100%;display:flex;flex-direction:column;gap:20px}
 .card{background:var(--sf);border-radius:16px;padding:32px;box-shadow:var(--sh);border:1px solid var(--bl)}
 .row{display:flex;gap:12px}
 .fg{margin-bottom:16px;display:flex;flex-direction:column;flex:1}
@@ -136,12 +136,12 @@ button:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
 /* Section split button between slides (bottom of cards) */
 .div-h .sec-brk{display:none!important}
 /* Home action cards */
-.home-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
-.home-act{display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px 14px;background:var(--sf);border:1.5px solid var(--bd);border-radius:12px;cursor:pointer;transition:all .15s;flex:1;min-width:120px;max-width:160px;text-align:center}
+.home-actions{display:flex;gap:8px;justify-content:center}
+.home-act{display:flex;flex-direction:column;align-items:center;gap:5px;padding:14px 10px;background:var(--sf);border:1.5px solid var(--bd);border-radius:12px;cursor:pointer;transition:all .15s;flex:1 1 0;min-width:0;max-width:140px;text-align:center}
 .home-act:hover{border-color:var(--ac);transform:translateY(-2px);box-shadow:var(--sh)}
-.home-act .ha-icon{font-size:28px}
-.home-act .ha-label{font-size:13px;font-weight:700;color:var(--tx)}
-.home-act .ha-sub{font-size:10px;color:var(--td);font-weight:500}
+.home-act .ha-icon{font-size:24px}
+.home-act .ha-label{font-size:12px;font-weight:700;color:var(--tx);white-space:nowrap}
+.home-act .ha-sub{font-size:9px;color:var(--td);font-weight:500}
 
 /* ── Detail ── */
 .det-bar{padding:16px 20px;border-top:1px solid var(--bl);background:var(--sa);display:flex;align-items:center;gap:24px}
@@ -165,6 +165,19 @@ button:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
 .mt-8{margin-top:8px}.mt-12{margin-top:12px}.mt-20{margin-top:20px}.mt-32{margin-top:32px}
 .mb-4{margin-bottom:4px}.mb-16{margin-bottom:16px}.mb-20{margin-bottom:20px}.mb-24{margin-bottom:24px}
 .w-full{width:100%}
+/* Loading overlay */
+.loading-ov{position:fixed;inset:0;background:rgba(250,245,239,.85);backdrop-filter:blur(6px);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;gap:16px}
+.loading-spinner{width:40px;height:40px;border:4px solid var(--bd);border-top-color:var(--ac);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-msg{font-size:16px;font-weight:600;color:var(--tm)}
+/* Lock indicator */
+.sl-lock{position:absolute;top:4px;right:4px;font-size:10px;color:var(--gold);opacity:.8}
+.sec-lock{font-size:11px;margin-left:4px;color:inherit;opacity:.6}
+/* Slide hover preview */
+.sl-preview{position:fixed;background:var(--sf);border-radius:12px;box-shadow:var(--shl);border:1px solid var(--bl);padding:10px;z-index:9998;pointer-events:none;display:none;max-width:360px}
+.sl-preview img{width:100%;border-radius:8px;display:block;margin-bottom:6px}
+.sl-preview .sl-prev-title{font-size:14px;font-weight:700;color:var(--tx);margin-bottom:2px}
+.sl-preview .sl-prev-info{font-size:12px;color:var(--td);font-family:var(--m)}
 </style>
 </head>
 <body>
@@ -223,8 +236,8 @@ function initTips(){
 // ─── State ───
 let state={screen:'home',plans:[],curPlan:null,actVId:null,selId:null,selSecId:null,hist:[],fut:[],dragId:null,fileHandle:null};
 
-function mkSlide(d,label,thumb){return{id:uid(),duration:d,label:label||'',thumb:thumb||null}}
-function mkSection(name,startIdx,endIdx){return{id:uid(),name:name||'Section',startIdx,endIdx}}
+function mkSlide(d,label,thumb){return{id:uid(),duration:d,label:label||'',thumb:thumb||null,locked:false}}
+function mkSection(name,startIdx,endIdx){return{id:uid(),name:name||'Section',startIdx,endIdx,locked:false}}
 function initSlides(n,tot){const p=round(Math.floor(tot/n));const sl=Array.from({length:n},()=>mkSlide(p));const u=p*n;if(u<tot)sl[sl.length-1].duration+=tot-u;return sl}
 
 // ─── Section operations ───
@@ -252,17 +265,17 @@ function splitSection(vid,secId,afterSlideIdx){
 function mergeSections(vid,secId){
   const v=state.curPlan.variants.find(x=>x.id===vid);if(!v)return;
   const secs=ensureSections(v);
-  if(secs.length<=1)return; // can't merge the only section
+  if(secs.length<=1)return;
   const si=secs.findIndex(s=>s.id===secId);if(si<0)return;
   pushUndo();
-  if(si<secs.length-1){
-    // Merge with next
-    secs[si].endIdx=secs[si+1].endIdx;
-    secs.splice(si+1,1);
-  }else{
-    // Last section: merge with previous
+  if(si>0){
+    // Merge this section into the one on the left
     secs[si-1].endIdx=secs[si].endIdx;
     secs.splice(si,1);
+  }else{
+    // First section: merge with the one on the right
+    secs[si].endIdx=secs[si+1].endIdx;
+    secs.splice(si+1,1);
   }
   if(state.selSecId===secId)state.selSecId=null;
   render();
@@ -286,41 +299,54 @@ function setSectionDuration(vid,secId,newDur){
   const v=state.curPlan.variants.find(x=>x.id===vid);if(!v)return;
   const secs=ensureSections(v);
   const sec=secs.find(s=>s.id===secId);if(!sec)return;
+  if(sec.locked)return; // Can't change locked section
   const slideCount=sec.endIdx-sec.startIdx+1;
   if(slideCount<=0)return;
-  const minDur=STEP*slideCount; // minimum 15s per slide
+  // Count unlocked slides in this section
+  let unlockedCount=0;
+  for(let i=sec.startIdx;i<=sec.endIdx;i++){if(!v.slides[i].locked)unlockedCount++}
+  if(unlockedCount===0)return; // All slides locked
+  const minDur=STEP*slideCount;
   newDur=round(clamp(newDur,minDur,v.totalDuration));
-  // Current section total
   let curTotal=0;
   for(let i=sec.startIdx;i<=sec.endIdx;i++)curTotal+=v.slides[i].duration;
   const diff=newDur-curTotal;if(diff===0)return;
   pushUndo();
-  // Distribute equally within section (min STEP per slide)
-  const perSlide=Math.max(STEP,round(Math.floor(newDur/slideCount)));
-  const remainder=newDur-perSlide*slideCount;
+  // Distribute among unlocked slides only
+  let lockedTotal=0;
+  for(let i=sec.startIdx;i<=sec.endIdx;i++){if(v.slides[i].locked)lockedTotal+=v.slides[i].duration}
+  const unlockDur=newDur-lockedTotal;
+  const perSlide=Math.max(STEP,round(Math.floor(unlockDur/unlockedCount)));
+  let rem=unlockDur-perSlide*unlockedCount;
   for(let i=sec.startIdx;i<=sec.endIdx;i++){
-    v.slides[i].duration=Math.max(STEP,perSlide+(i===sec.endIdx?remainder:0));
+    if(v.slides[i].locked)continue;
+    v.slides[i].duration=Math.max(STEP,perSlide+(rem!==0?(rem>0?((rem-=STEP,STEP)):0):0));
   }
-  // Give/take the diff from adjacent section
+  // Fix remainder on last unlocked slide
+  let actualTotal=0;for(let i=sec.startIdx;i<=sec.endIdx;i++)actualTotal+=v.slides[i].duration;
+  const finalDiff=newDur-actualTotal;
+  if(finalDiff!==0){for(let i=sec.endIdx;i>=sec.startIdx;i--){if(!v.slides[i].locked){v.slides[i].duration=Math.max(STEP,v.slides[i].duration+finalDiff);break}}}
+  // Give/take from adjacent unlocked section
   const secIdx=secs.indexOf(sec);
-  const adjIdx=secIdx<secs.length-1?secIdx+1:(secIdx>0?secIdx-1:-1);
+  let adjIdx=-1;
+  // Find next unlocked section, then try previous
+  for(let j=secIdx+1;j<secs.length;j++){if(!secs[j].locked){adjIdx=j;break}}
+  if(adjIdx<0){for(let j=secIdx-1;j>=0;j--){if(!secs[j].locked){adjIdx=j;break}}}
   if(adjIdx>=0){
     const adjSec=secs[adjIdx];
-    const adjCount=adjSec.endIdx-adjSec.startIdx+1;
     if(diff>0){
-      // Take time from adjacent section
-      let rem=diff;
-      for(let i=adjSec.startIdx;i<=adjSec.endIdx&&rem>0;i++){
-        const take=Math.min(v.slides[i].duration,rem);
-        v.slides[i].duration-=take;rem-=take;
+      let r=diff;
+      for(let i=adjSec.startIdx;i<=adjSec.endIdx&&r>0;i++){
+        if(v.slides[i].locked)continue;
+        const take=Math.min(Math.max(v.slides[i].duration-STEP,0),r);
+        v.slides[i].duration-=take;r-=take;
       }
     }else{
-      // Give time to adjacent section equally
-      const give=Math.abs(diff);
-      const perAdj=round(Math.floor(give/adjCount));
-      const remAdj=give-perAdj*adjCount;
-      for(let i=adjSec.startIdx;i<=adjSec.endIdx;i++){
-        v.slides[i].duration+=perAdj+(i===adjSec.endIdx?remAdj:0);
+      let unl=0;for(let i=adjSec.startIdx;i<=adjSec.endIdx;i++){if(!v.slides[i].locked)unl++}
+      if(unl>0){
+        const give=Math.abs(diff);const perAdj=round(Math.floor(give/unl));const remAdj=give-perAdj*unl;let last=-1;
+        for(let i=adjSec.startIdx;i<=adjSec.endIdx;i++){if(!v.slides[i].locked){v.slides[i].duration+=perAdj;last=i}}
+        if(last>=0)v.slides[last].duration+=remAdj;
       }
     }
   }
@@ -331,6 +357,49 @@ function renameSec(vid,secId,name){
   const v=state.curPlan.variants.find(x=>x.id===vid);if(!v)return;
   const sec=ensureSections(v).find(s=>s.id===secId);
   if(sec)sec.name=name.slice(0,20);
+}
+
+function toggleSlideLock(vid,sid){
+  const v=state.curPlan.variants.find(x=>x.id===vid);if(!v)return;
+  const s=v.slides.find(x=>x.id===sid);if(s)s.locked=!s.locked;
+  render();
+}
+
+function toggleSectionLock(vid,secId){
+  const v=state.curPlan.variants.find(x=>x.id===vid);if(!v)return;
+  const sec=ensureSections(v).find(s=>s.id===secId);if(!sec)return;
+  sec.locked=!sec.locked;
+  // Also lock/unlock all slides in the section
+  for(let i=sec.startIdx;i<=sec.endIdx;i++){v.slides[i].locked=sec.locked}
+  render();
+}
+
+function reorderSection(vid,fromSecId,toSecId){
+  const v=state.curPlan.variants.find(x=>x.id===vid);if(!v)return;
+  const secs=ensureSections(v);
+  const fi=secs.findIndex(s=>s.id===fromSecId);
+  const ti=secs.findIndex(s=>s.id===toSecId);
+  if(fi<0||ti<0||fi===ti)return;
+  pushUndo();
+  // Extract slides belonging to the from-section
+  const fromSec=secs[fi];
+  const movedSlides=v.slides.splice(fromSec.startIdx,fromSec.endIdx-fromSec.startIdx+1);
+  // Recalculate target position after splice
+  const toSec=secs[ti];
+  const insertIdx=fi<ti?toSec.endIdx-movedSlides.length+1:toSec.startIdx;
+  v.slides.splice(insertIdx,0,...movedSlides);
+  // Rebuild section indices
+  const[movedSecDef]=secs.splice(fi,1);
+  const newTi=fi<ti?ti-1:ti;
+  secs.splice(newTi,0,movedSecDef);
+  // Fix all indices
+  let idx=0;
+  secs.forEach(sec=>{
+    const count=sec.endIdx-sec.startIdx+1;
+    sec.startIdx=idx;sec.endIdx=idx+count-1;
+    idx+=count;
+  });
+  render();
 }
 
 // Fix section indices after slide add/remove/reorder
@@ -354,17 +423,26 @@ async function parsePptx(file){
     const slideFiles=[];
     zip.forEach((path)=>{if(/^ppt\/slides\/slide\d+\.xml$/.test(path))slideFiles.push({path,num:parseInt(path.match(/slide(\d+)/)[1])})});
     slideFiles.sort((a,b)=>a.num-b.num);
-    const slideCount=slideFiles.length;
-    if(!slideCount){alert('No slides found in this file.');return null}
+    if(!slideFiles.length){alert('No slides found in this file.');return null}
+    // Detect hidden slides: <p:sld show="0"> means hidden
+    const visibleSlides=[];
     const titles=[];
     for(const sf of slideFiles){
       const xml=await zip.file(sf.path).async('text');
+      // Check if slide is hidden (show="0" on the root <p:sld> element)
+      const isHidden=/^<\?xml[^?]*\?>\s*<p:sld[^>]*\bshow\s*=\s*"0"/i.test(xml);
+      if(isHidden)continue; // Skip hidden slides
+      visibleSlides.push(sf);
       let title='';
       const titleMatch=xml.match(/<p:sp>[\s\S]*?<p:ph[^>]*type="title"[\s\S]*?<\/p:sp>/i)||xml.match(/<p:sp>[\s\S]*?<p:ph[^>]*type="ctrTitle"[\s\S]*?<\/p:sp>/i);
       if(titleMatch){const texts=titleMatch[0].match(/<a:t>([^<]*)<\/a:t>/g);if(texts)title=texts.map(t=>t.replace(/<\/?a:t>/g,'')).join(' ').trim()}
       if(!title){const ft=xml.match(/<a:t>([^<]+)<\/a:t>/);if(ft)title=ft[1].trim().slice(0,30)}
       titles.push(title.slice(0,MAX_LABEL));
     }
+    const slideCount=visibleSlides.length;
+    if(!slideCount){alert('No visible slides found in this file.');return null}
+    const skipped=slideFiles.length-slideCount;
+    if(skipped>0)console.log(`Skipped ${skipped} hidden slide(s)`);
     // Extract sections from presentation.xml
     const sections=[];
     const presFile=zip.file('ppt/presentation.xml');
@@ -372,16 +450,21 @@ async function parsePptx(file){
       const presXml=await presFile.async('text');
       const secMatches=[...presXml.matchAll(/<p14:section[^>]*name="([^"]*)"[^>]*>[\s\S]*?<\/p14:section>/gi)];
       if(secMatches.length){
+        // Note: section slide counts may include hidden slides, so we recalculate
+        let idx=0;
         secMatches.forEach(m=>{
           const name=m[1]||'Section';
           const slideIds=[...m[0].matchAll(/<p14:sldId[^>]*id="([^"]*)"[^>]*/gi)];
-          if(slideIds.length){
-            sections.push({name:name.slice(0,20),slideCount:slideIds.length});
+          // Count only visible slides in this section (approximate: use proportional distribution)
+          if(slideIds.length&&idx<slideCount){
+            const visCount=Math.min(slideIds.length,slideCount-idx);
+            sections.push({name:name.slice(0,20),slideCount:visCount});
+            idx+=visCount;
           }
         });
       }
     }
-    return{slideCount,titles,thumbs:new Array(slideCount).fill(null),sections};
+    return{slideCount,titles,thumbs:new Array(slideCount).fill(null),sections,hiddenSkipped:skipped};
   }catch(e){console.error('PPTX parse error:',e);alert('Could not parse this PPTX file.');return null}
 }
 
@@ -509,10 +592,11 @@ function getAV(){return state.curPlan?.variants.find(v=>v.id===state.actVId)||st
 function setDur(vid,sid,nd){
   const v=state.curPlan.variants.find(x=>x.id===vid);if(!v)return;
   const sl=[...v.slides];const i=sl.findIndex(x=>x.id===sid);if(i<0)return;
+  if(sl[i].locked)return; // Can't change locked slide
   nd=round(clamp(nd,STEP,v.totalDuration));const d=nd-sl[i].duration;if(!d)return;
   pushUndo();sl[i]={...sl[i],duration:nd};
-  if(d>0){let r=d;for(let j=i+1;j<sl.length&&r>0;j++){const tk=Math.min(Math.max(sl[j].duration-STEP,0),r);sl[j]={...sl[j],duration:sl[j].duration-tk};r-=tk}if(r>0)sl[i]={...sl[i],duration:nd-r}}
-  else{for(let j=i+1;j<sl.length;j++){sl[j]={...sl[j],duration:sl[j].duration+(-d)};break}}
+  if(d>0){let r=d;for(let j=i+1;j<sl.length&&r>0;j++){if(sl[j].locked)continue;const tk=Math.min(Math.max(sl[j].duration-STEP,0),r);sl[j]={...sl[j],duration:sl[j].duration-tk};r-=tk}if(r>0)sl[i]={...sl[i],duration:nd-r}}
+  else{for(let j=i+1;j<sl.length;j++){if(sl[j].locked)continue;sl[j]={...sl[j],duration:sl[j].duration+(-d)};break}}
   v.slides=sl;render();
 }
 
@@ -573,6 +657,7 @@ function render(){
   const app=$('#app');
   if(state.screen==='home')renderHome(app);
   else if(state.screen==='create')renderCreate(app);
+  else if(state.screen==='combo')renderCombo(app);
   else if(state.screen==='editor')renderEditor(app);
 }
 
@@ -586,10 +671,13 @@ function renderHome(app){
         <div class="ha-icon">✏️</div><div class="ha-label">New Plan</div><div class="ha-sub">Start from scratch</div>
       </div>
       <div class="home-act" onclick="pickFile('.pdf')" data-tip="Import a PDF for slide count + visual thumbnails">
-        <div class="ha-icon">📄</div><div class="ha-label">Import PDF</div><div class="ha-sub">With thumbnails</div>
+        <div class="ha-icon">📄</div><div class="ha-label">Import PDF</div><div class="ha-sub">Thumbnails + titles</div>
       </div>
       <div class="home-act" onclick="pickFile('.pptx')" data-tip="Import a PPTX for slide count, titles and sections">
         <div class="ha-icon">📊</div><div class="ha-label">Import PPTX</div><div class="ha-sub">Titles + sections</div>
+      </div>
+      <div class="home-act" onclick="goComboImport()" data-tip="Import PDF + PPTX together for thumbnails, titles and sections" style="border-color:var(--abr)">
+        <div class="ha-icon">📄+📊</div><div class="ha-label">PDF + PPTX</div><div class="ha-sub">Best of both</div>
       </div>
       <div class="home-act" onclick="doImport()" data-tip="Load a previously saved .json plan">
         <div class="ha-icon">📂</div><div class="ha-label">Load Plan</div><div class="ha-sub">From .json file</div>
@@ -663,6 +751,47 @@ function renderCreate(app){
 }
 
 
+// ─── COMBO IMPORT SCREEN ───
+function renderCombo(app){
+  const pdf=window._comboPdf;
+  const pptx=window._comboPptx;
+  const pdfOk=pdf&&pdf.name;
+  const pptxOk=pptx&&pptx.name;
+  const bothOk=pdfOk&&pptxOk;
+  
+  let statusHtml='';
+  if(bothOk){
+    statusHtml=`<div class="prev" style="background:#e8f5e9;border-color:#c8e6c9;color:#2e7d32">✅ Both files ready — ${pdf.name} + ${pptx.name}</div>`;
+  }
+  
+  app.innerHTML=`<div class="page"><div class="col" style="max-width:620px">
+    <button class="bk" onclick="goHome()" data-tip="Back to all plans" style="font-size:15px">${ic('chevL',18)} Back</button>
+    <div class="card">
+      <div class="flex items-c gap-8 mb-24" style="color:var(--ac)">${ic('clock')} <h2 style="font-size:24px;font-weight:800;color:var(--tx)">Import PDF + PPTX</h2></div>
+      <p style="font-size:14px;color:var(--tm);margin-bottom:20px">Upload both files to get <strong>thumbnails</strong> from the PDF and <strong>sections + titles</strong> from the PPTX. Both must have the same number of slides.</p>
+      
+      <div class="flex gap-12" style="margin-bottom:20px">
+        <div style="flex:1">
+          <div class="fl">PDF file (thumbnails)</div>
+          <div class="pptx-drop" onclick="pickComboFile('pdf')" style="min-height:80px;display:flex;align-items:center;justify-content:center;gap:8px;${pdfOk?'border-color:var(--green);background:#f0fdf4':''}">
+            ${pdfOk?`<span style="color:var(--green);font-weight:700">📄 ${esc(pdf.name)}</span>`:'<span style="color:var(--td)">📄 Click to select PDF</span>'}
+          </div>
+        </div>
+        <div style="flex:1">
+          <div class="fl">PPTX file (sections + titles)</div>
+          <div class="pptx-drop" onclick="pickComboFile('pptx')" style="min-height:80px;display:flex;align-items:center;justify-content:center;gap:8px;${pptxOk?'border-color:var(--green);background:#f0fdf4':''}">
+            ${pptxOk?`<span style="color:var(--green);font-weight:700">📊 ${esc(pptx.name)}</span>`:'<span style="color:var(--td)">📊 Click to select PPTX</span>'}
+          </div>
+        </div>
+      </div>
+      
+      ${statusHtml}
+      
+      <button class="bp" ${bothOk?'':`disabled style="opacity:.4;pointer-events:none"`} onclick="processComboImport()">Import & Create Plan</button>
+    </div>
+  </div></div>`;
+}
+
 // ─── EDITOR ───
 function renderEditor(app){
   const p=state.curPlan;if(!p)return;
@@ -732,14 +861,15 @@ function renderEditor(app){
             </div>
           </div>
           <div class="flex-1 flex flex-col" style="gap:4px">
+            ${ss.locked?`<div style="font-size:13px;color:var(--gold);font-weight:600">🔒 This slide is locked — unlock to change duration</div>`:`
             <div class="flex items-c gap-8">
               <span class="fl" style="margin:0;min-width:58px">Duration</span>
               <input type="range" min="${STEP}" max="${v.totalDuration}" step="${STEP}" value="${ss.duration}" oninput="setDur('${v.id}','${ss.id}',parseInt(this.value));render()" title="Drag to adjust duration" style="flex:1;accent-color:var(--ac);height:6px">
               <input class="fi fi-sm fi-mono" value="${fmt(ss.duration)}" style="width:72px" onblur="commitDur('${v.id}','${ss.id}',this.value)" onkeydown="if(event.key==='Enter')commitDur('${v.id}','${ss.id}',this.value)" title="Type duration as mm:ss">
-            </div>
-            ${ss.duration===0?'<div style="font-size:12px;color:var(--gold);font-weight:600">⚠ Hidden (0 duration)</div>':''}
+            </div>`}
           </div>
           <div class="flex gap-6">
+            <button class="bd" onclick="toggleSlideLock('${v.id}','${ss.id}')" data-tip="${ss.locked?'Unlock this slide':'Lock this slide duration'}" style="${ss.locked?'color:var(--gold)':''}">${ss.locked?'🔒 Locked':'🔓 Lock'}</button>
             ${v.slides.length<MAX_SLIDES?`<button class="bd" onclick="addSlideAfter('${v.id}',${si})" data-tip="Insert slide after this one">${ic('plus',15)}</button>`:''}
             ${v.slides.length>1?`<button class="bd" style="color:var(--coral)" onclick="rmSlide('${v.id}','${ss.id}')" data-tip="Remove this slide">${ic('trash',15)}</button>`:''}
           </div>
@@ -802,6 +932,7 @@ function renderTimelineWithSections(v,isAct,dm){
       data-tip="Slide ${i+1}${s.label?' \u2014 '+s.label:''} \u00b7 ${fmtD(s.duration)} \u00b7 ends ${fmt(pos[i].end)}">`;
     if(!z){
       h+=`<div class="sl-grip">${ic('grip')}</div>`;
+      if(s.locked)h+=`<div class="sl-lock">🔒</div>`;
       h+=`<div class="sl-n">${i+1}</div>`;
       if(s.thumb)h+=`<img class="sl-thumb" src="${s.thumb}" alt="Slide ${i+1}" draggable="false">`;
       h+=`<div class="sl-l">${s.label||'<span style="opacity:.25">\u2014</span>'}</div>`;
@@ -833,11 +964,12 @@ function renderTimelineWithSections(v,isAct,dm){
       // Section spans from startCol to endCol (inclusive), which in grid is startCol / endCol+1
       h+=`<div class="sec-block sec-colors-${si%8} ${isSel?'sel':''}" 
         style="grid-column:${startCol}/${endCol+1};grid-row:3;margin-top:8px;border-radius:10px${isAct?'':';opacity:0.7;cursor:default'}"
-        ${isAct?`onclick="event.stopPropagation();state.selSecId='${sec.id}';state.selId=null;render()"`:''} 
-        data-tip="${esc(sec.name)} · ${slideCount} slide${slideCount!==1?'s':''} · ${fmtD(secDur)}">
+        ${isAct?`onclick="event.stopPropagation();state.selSecId='${sec.id}';state.selId=null;render()" draggable="true" ondragstart="state.dragSecId='${sec.id}'" ondragover="event.preventDefault()" ondrop="event.stopPropagation();reorderSection('${v.id}',state.dragSecId,'${sec.id}')"`:''} 
+        data-tip="${esc(sec.name)} · ${slideCount} slide${slideCount!==1?'s':''} · ${fmtD(secDur)}${sec.locked?' · 🔒 Locked':''}">
         <span class="sec-name">${esc(sec.name)}</span>
         <span class="sec-time">${fmtD(secDur)}</span>
         <span class="sec-slides">(${slideCount})</span>
+        ${sec.locked?'<span class="sec-lock">🔒</span>':''}
       </div>`;
       // Merge button in the divider column between sections (active variant only)
       if(isAct&&si<secs.length-1){
@@ -890,6 +1022,7 @@ function renderSecDetail(v){
   if(canMerge){
     h+=`<button class="bd" style="color:var(--coral)" onclick="mergeSections('${v.id}','${sec.id}')" data-tip="Merge with adjacent section">${ic('trash',14)} Merge</button>`;
   }
+  h+=`<button class="bd" onclick="toggleSectionLock('${v.id}','${sec.id}')" data-tip="${sec.locked?'Unlock section':'Lock section duration'}" style="${sec.locked?'color:var(--gold)':''}">${sec.locked?'🔒 Locked':'🔓 Lock'}</button>`;
   h+=`</div>`;
   return h;
 }
@@ -946,25 +1079,81 @@ window.pickFile=(accept)=>{
   inp.onchange=()=>{const f=inp.files&&inp.files[0];if(f)handleImportFile(f)};
   inp.click();
 };
+window.goComboImport=()=>{
+  window._comboPdf=null;window._comboPptx=null;
+  state.screen='combo';render();
+};
+window.pickComboFile=(type)=>{
+  const accept=type==='pdf'?'.pdf':'.pptx';
+  const inp=document.createElement('input');inp.type='file';inp.accept=accept;
+  inp.onchange=()=>{
+    const f=inp.files&&inp.files[0];if(!f)return;
+    if(type==='pdf')window._comboPdf=f;else window._comboPptx=f;
+    renderCombo($('#app'));
+  };
+  inp.click();
+};
+window.processComboImport=async()=>{
+  const pdfFile=window._comboPdf;const pptxFile=window._comboPptx;
+  if(!pdfFile||!pptxFile)return;
+  showLoading('Importing PDF...');
+  try{
+    const pdfData=await parsePdf(pdfFile);
+    if(!pdfData){hideLoading();return}
+    showLoading('Extracting sections from PPTX...');
+    const pptxData=await parsePptx(pptxFile);
+    if(!pptxData){hideLoading();return}
+    if(pdfData.slideCount!==pptxData.slideCount){
+      hideLoading();
+      alert('Slide count mismatch!\n\nPDF: '+pdfData.slideCount+' slides\nPPTX: '+pptxData.slideCount+' slides\n\nPlease make sure both files are the same presentation.');
+      return;
+    }
+    // Merge: PDF thumbnails + PPTX titles (prefer PPTX) + PPTX sections
+    for(let i=0;i<pdfData.slideCount;i++){
+      if(pptxData.titles[i])pdfData.titles[i]=pptxData.titles[i];
+    }
+    if(pptxData.sections&&pptxData.sections.length>0){
+      pdfData.sections=pptxData.sections;
+    }
+    window._importData=pdfData;
+    window._ns=pdfData.slideCount;
+    window._nn=pdfFile.name.replace(/\.pdf$/i,'');
+    window._nm=15;window._nc=0;
+    state.screen='create';
+    hideLoading();
+    renderCreate($('#app'));
+  }catch(e){hideLoading();console.error(e);alert('Import failed: '+e.message)}
+};
 window.handleImportFile=async(file)=>{
   const name=file.name.toLowerCase();
-  let data=null;
-  if(name.endsWith('.pdf')){
-    data=await parsePdf(file);
-  }else if(name.endsWith('.pptx')){
-    data=await parsePptx(file);
-  }else{alert('Please select a .pdf or .pptx file');return}
-  if(data){
-    window._importData=data;
-    window._ns=data.slideCount;
-    window._nn=file.name.replace(/\.(pptx|pdf)$/i,'');
-    if(state.screen==='home'){
-      // Go directly to create screen with data pre-filled
-      window._nm=15;window._nc=0;
-      state.screen='create';
+  showLoading('Importing '+(name.endsWith('.pdf')?'PDF':'PPTX')+'...');
+  try{
+    let data=null;
+    if(name.endsWith('.pdf')){
+      data=await parsePdf(file);
+    }else if(name.endsWith('.pptx')){
+      data=await parsePptx(file);
+    }else{hideLoading();alert('Please select a .pdf or .pptx file');return}
+    hideLoading();
+    if(data){
+      window._importData=data;
+      window._ns=data.slideCount;
+      window._nn=file.name.replace(/\.(pptx|pdf)$/i,'');
+      if(state.screen==='home'){window._nm=15;window._nc=0;state.screen='create'}
+      renderCreate($('#app'));
     }
-    renderCreate($('#app'));
-  }
+  }catch(e){hideLoading();console.error(e);alert('Import failed: '+e.message)}
+};
+// Loading overlay
+window.showLoading=(msg)=>{
+  let ov=document.getElementById('loading-ov');
+  if(!ov){ov=el('div','loading-ov');ov.id='loading-ov';document.body.appendChild(ov)}
+  ov.innerHTML=`<div class="loading-spinner"></div><div class="loading-msg">${msg||'Loading...'}</div>`;
+  ov.style.display='flex';
+};
+window.hideLoading=()=>{
+  const ov=document.getElementById('loading-ov');
+  if(ov)ov.style.display='none';
 };
 window.doCreate=()=>{
   const id=window._importData;
@@ -1054,6 +1243,8 @@ window.startDivDrag=startDivDrag;window.state=state;
 window.addSectionBreak=addSectionBreak;window.removeSectionBreak=removeSectionBreak;
 window.setSectionDuration=setSectionDuration;window.renameSec=renameSec;
 window.splitSection=splitSection;window.mergeSections=mergeSections;
+window.toggleSlideLock=toggleSlideLock;window.toggleSectionLock=toggleSectionLock;
+window.reorderSection=reorderSection;
 window.round=round;window.parseT=parseT;
 window.commitSecDur=(vid,secId,val)=>{setSectionDuration(vid,secId,round(parseT(val)))};
 window.removeSectionBreakAt=(vid,slideIdx)=>{
@@ -1065,6 +1256,30 @@ window.removeSectionBreakAt=(vid,slideIdx)=>{
 
 // ─── INIT ───
 initTips();
+// Slide hover preview
+let prevEl=null;
+function initPreview(){
+  prevEl=el('div','sl-preview');document.body.appendChild(prevEl);
+  document.addEventListener('mouseover',e=>{
+    const sl=e.target.closest('.sl[data-sid]');
+    if(sl&&state.curPlan){
+      const sid=sl.dataset.sid;const vid=sl.dataset.vid;
+      const v=state.curPlan.variants.find(x=>x.id===vid);
+      if(!v)return;
+      const s=v.slides.find(x=>x.id===sid);
+      if(!s||!s.thumb)return;
+      const si=v.slides.indexOf(s);
+      const r=sl.getBoundingClientRect();
+      prevEl.innerHTML=`<img src="${s.thumb}" alt="Slide ${si+1}"><div class="sl-prev-title">${s.label||'Slide '+(si+1)}</div><div class="sl-prev-info">${fmtD(s.duration)}</div>`;
+      prevEl.style.display='block';
+      prevEl.style.left=Math.min(r.left,window.innerWidth-380)+'px';
+      prevEl.style.top=Math.max(8,r.top-prevEl.offsetHeight-8)+'px';
+    }else{
+      if(prevEl)prevEl.style.display='none';
+    }
+  });
+}
+initPreview();
 render();
 </script>
 </body>
